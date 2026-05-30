@@ -25,13 +25,19 @@ import {
   aggregateSleepByDay,
   aggregateTummyByDay,
   getEntriesForDay,
+  formatTime,
   parseDuration,
 } from "../utils/formatters";
+import {
+  calculateFeedingAmounts,
+  getLastBreastUsed,
+  summarizeMilkByType,
+} from "../utils/feedingInsights";
 import { useUnits } from "../utils/units";
 
 const COLLAPSED_COUNT = 2;
 
-export default function OverviewTab({ feedings, weeklyFeedings: weeklyFeedingsRaw, sleepEntries, weeklySleep, changes, tummyTimes, weeklyTummyTimes, onEditEntry }) {
+export default function OverviewTab({ feedings, weeklyFeedings: weeklyFeedingsRaw, sleepEntries, weeklySleep, changes, tummyTimes, weeklyTummyTimes, weights, onEditEntry }) {
   const units = useUnits();
   const [expanded, setExpanded] = useState({});
   const [dayModal, setDayModal] = useState(null);
@@ -44,6 +50,9 @@ export default function OverviewTab({ feedings, weeklyFeedings: weeklyFeedingsRa
   const weeklyFeedings = aggregateByDayOfWeek(weeklyFeedingsRaw, "amount");
   const sleepByDay = aggregateSleepByDay(weeklySleep);
   const tummyByDay = aggregateTummyByDay(weeklyTummyTimes);
+  const feedingAmounts = calculateFeedingAmounts(weights);
+  const lastBreast = getLastBreastUsed(weeklyFeedingsRaw);
+  const milkTotals = summarizeMilkByType(weeklyFeedingsRaw);
 
   const totalFeeding = feedings.reduce((s, f) => s + (f.amount || 0), 0);
   const totalSleep = sleepEntries.reduce(
@@ -127,6 +136,86 @@ export default function OverviewTab({ feedings, weeklyFeedings: weeklyFeedingsRa
             sub={`${tummyTimes.length} session${tummyTimes.length !== 1 ? "s" : ""} today`}
             color={colors.tummy}
           />
+        </div>
+      </div>
+
+      {/* Feeding Insights */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          gap: 14,
+          marginBottom: 20,
+        }}
+      >
+        <div className="fade-in fade-in-1">
+          <SectionCard title="Feeding Amount Guide" icon={<Icons.Weight />} color={colors.growth}>
+            {feedingAmounts ? (
+              <div style={{ display: "grid", gap: 12 }}>
+                <div style={{ color: "var(--text-muted)", fontSize: 13 }}>
+                  Based on {feedingAmounts.weight} kg × 150 {units.volume}/kg/day
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
+                  <div>
+                    <div style={{ color: "var(--text-dim)", fontSize: 11 }}>Daily</div>
+                    <div style={{ color: colors.growth, fontSize: 20, fontWeight: 700 }}>{feedingAmounts.dailyAmount}</div>
+                    <div style={{ color: "var(--text-muted)", fontSize: 11 }}>{units.volume}</div>
+                  </div>
+                  <div>
+                    <div style={{ color: "var(--text-dim)", fontSize: 11 }}>7 feeds</div>
+                    <div style={{ color: colors.growth, fontSize: 20, fontWeight: 700 }}>{feedingAmounts.sevenFeeds}</div>
+                    <div style={{ color: "var(--text-muted)", fontSize: 11 }}>{units.volume}/feed</div>
+                  </div>
+                  <div>
+                    <div style={{ color: "var(--text-dim)", fontSize: 11 }}>8 feeds</div>
+                    <div style={{ color: colors.growth, fontSize: 20, fontWeight: 700 }}>{feedingAmounts.eightFeeds}</div>
+                    <div style={{ color: "var(--text-muted)", fontSize: 11 }}>{units.volume}/feed</div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div style={{ color: "var(--text-dim)", fontSize: 13, textAlign: "center", padding: 20 }}>
+                Add a weight entry to calculate feeding amounts
+              </div>
+            )}
+          </SectionCard>
+        </div>
+
+        <div className="fade-in fade-in-2">
+          <SectionCard title="Breast Feeding" icon={<Icons.Heart />} color={colors.feeding}>
+            <div style={{ display: "grid", gap: 12 }}>
+              <div>
+                <div style={{ color: "var(--text-dim)", fontSize: 11, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                  Last breast used
+                </div>
+                <div style={{ color: colors.feeding, fontSize: 24, fontWeight: 700 }}>
+                  {lastBreast ? lastBreast.breast : "—"}
+                </div>
+                <div style={{ color: "var(--text-muted)", fontSize: 12 }}>
+                  {lastBreast ? `${lastBreast.method} · ${formatTime(lastBreast.time)}` : "No breast feedings found"}
+                </div>
+              </div>
+              <div style={{ borderTop: "1px solid var(--border)", paddingTop: 12 }}>
+                <div style={{ color: "var(--text-dim)", fontSize: 11, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                  Last 24 hours
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 8 }}>
+                  <div>
+                    <div style={{ color: "var(--text-muted)", fontSize: 12 }}>Breast milk</div>
+                    <div style={{ color: colors.feeding, fontSize: 20, fontWeight: 700 }}>
+                      {Math.round(milkTotals.breastMilk)} {units.volume}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ color: "var(--text-muted)", fontSize: 12 }}>Formula</div>
+                    <div style={{ color: colors.tummy, fontSize: 20, fontWeight: 700 }}>
+                      {Math.round(milkTotals.formula)} {units.volume}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </SectionCard>
         </div>
       </div>
 

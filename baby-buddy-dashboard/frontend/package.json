@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node tests/pumping-timer.test.mjs && node tests/decimal-input.test.mjs"
+    "test": "node tests/pumping-timer.test.mjs && node tests/decimal-input.test.mjs && node tests/feeding-insights.test.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
