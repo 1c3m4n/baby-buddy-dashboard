@@ -13,6 +13,7 @@ import SleepForm from "./components/forms/SleepForm";
 import DiaperForm from "./components/forms/DiaperForm";
 import TemperatureForm from "./components/forms/TemperatureForm";
 import TummyTimeForm from "./components/forms/TummyTimeForm";
+import PumpingForm from "./components/forms/PumpingForm";
 import NoteForm from "./components/forms/NoteForm";
 import WeightForm from "./components/forms/WeightForm";
 import HeightForm from "./components/forms/HeightForm";
@@ -53,6 +54,7 @@ const ACTION_GROUPS = [
 
 const TIMER_TYPES = [
   { id: "feeding", label: "Feeding", icon: <Icons.Bottle />, color: colors.feeding },
+  { id: "pumping", label: "Pumping", icon: <Icons.Pump />, color: colors.pumping },
   { id: "sleep", label: "Sleep", icon: <Icons.Moon />, color: colors.sleep },
   { id: "tummy", label: "Tummy Time", icon: <Icons.Sun />, color: colors.tummy },
 ];
@@ -67,6 +69,7 @@ function timerNameToType(name) {
   const n = name.toLowerCase();
   if (n.includes("sleep")) return "sleep";
   if (n.includes("tummy")) return "tummy";
+  if (n.includes("pump")) return "pumping";
   return "feeding";
 }
 
@@ -372,6 +375,15 @@ export default function App() {
       )}
       {modal?.type === "tummy" && (
         <TummyTimeForm
+          childId={data.child?.id}
+          timerId={modal.timerId}
+          entry={modal.entry}
+          onDone={handleFormDone}
+          onClose={closeModal}
+        />
+      )}
+      {modal?.type === "pumping" && (
+        <PumpingForm
           childId={data.child?.id}
           timerId={modal.timerId}
           entry={modal.entry}
