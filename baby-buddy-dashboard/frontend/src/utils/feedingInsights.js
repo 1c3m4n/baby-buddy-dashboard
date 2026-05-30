@@ -7,6 +7,10 @@ function entryTime(entry) {
   return entry?.end || entry?.start || entry?.time || entry?.date || null;
 }
 
+function roundUpToNearestTen(value) {
+  return Math.ceil(value / 10) * 10;
+}
+
 function formatBreast(method) {
   const normalized = String(method || "").toLowerCase();
   if (normalized.includes("left breast")) return "Left";
@@ -26,9 +30,9 @@ export function calculateFeedingAmounts(weights) {
   const dailyAmount = latest.weightValue * 150;
   return {
     weight: Math.round(latest.weightValue * 100) / 100,
-    dailyAmount: Math.round(dailyAmount),
-    sevenFeeds: Math.round(dailyAmount / 7),
-    eightFeeds: Math.round(dailyAmount / 8),
+    dailyAmount: roundUpToNearestTen(dailyAmount),
+    sevenFeeds: roundUpToNearestTen(dailyAmount / 7),
+    eightFeeds: roundUpToNearestTen(dailyAmount / 8),
   };
 }
 
