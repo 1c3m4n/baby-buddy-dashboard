@@ -3,6 +3,7 @@ import { api } from "../../api";
 import Modal, { FormField, FormInput, FormButton } from "../Modal";
 import { colors } from "../../utils/colors";
 import { useUnits } from "../../utils/units";
+import { parseDecimalInput } from "../../utils/decimalInput";
 
 function toLocalDate(date) {
   const d = new Date(date);
@@ -20,10 +21,12 @@ export default function WeightForm({ childId, entry, onDone, onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!weight) return;
+    const parsedWeight = parseDecimalInput(weight);
+    if (Number.isNaN(parsedWeight)) return;
     setSaving(true);
     try {
       const data = {
-        weight: parseFloat(weight),
+        weight: parsedWeight,
         date,
       };
       if (isEdit) {
@@ -43,13 +46,12 @@ export default function WeightForm({ childId, entry, onDone, onClose }) {
       <form onSubmit={handleSubmit}>
         <FormField label={`Weight (${units.weight})`}>
           <FormInput
-            type="number"
+            type="text"
+            inputMode="decimal"
             value={weight}
             onChange={(e) => setWeight(e.target.value)}
-            placeholder="5.0"
-            min="0"
-            max="30"
-            step="0.01"
+            placeholder="5.0 or 5,0"
+            pattern="[0-9]+([.,][0-9]+)?"
             autoFocus
             required
           />
