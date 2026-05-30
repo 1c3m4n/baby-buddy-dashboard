@@ -45,7 +45,7 @@ The backend acts as an API proxy so the Baby Buddy API key stays server-side and
 2. Click the **three dots** (top right) > **Repositories**
 3. Add this repository URL:
    ```
-   https://github.com/mbentancour/baby-buddy-dashboard
+   https://github.com/1c3m4n/baby-buddy-dashboard
    ```
 4. Find **Baby Buddy Dashboard** in the store and click **Install**
 5. Configure the add-on:
@@ -55,6 +55,11 @@ The backend acts as an API proxy so the Baby Buddy API key stays server-side and
    - **Unit System** — `metric` or `imperial` (labels only, no conversion)
    - **Demo Mode** — enable to preview with mock data (no Baby Buddy required)
 6. Start the add-on — the dashboard appears in the Home Assistant sidebar
+
+The add-on also exposes its web interface directly on port `8099` by default,
+so it can be opened outside the Home Assistant ingress frame at
+`http://<home-assistant-host>:8099`. You can change or disable this host port
+from the add-on's **Network** settings in Home Assistant.
 
 ## Docker Compose
 
