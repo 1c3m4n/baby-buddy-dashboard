@@ -31,6 +31,7 @@ import {
 import {
   calculateFeedingAmounts,
   getLastBreastUsed,
+  getVitaminRecommendation,
   summarizeMilkByType,
 } from "../utils/feedingInsights";
 import { useUnits } from "../utils/units";
@@ -53,6 +54,7 @@ export default function OverviewTab({ feedings, weeklyFeedings: weeklyFeedingsRa
   const feedingAmounts = calculateFeedingAmounts(weights);
   const lastBreast = getLastBreastUsed(weeklyFeedingsRaw);
   const milkTotals = summarizeMilkByType(weeklyFeedingsRaw);
+  const vitaminRecommendation = getVitaminRecommendation(milkTotals);
 
   const totalFeeding = feedings.reduce((s, f) => s + (f.amount || 0), 0);
   const totalSleep = sleepEntries.reduce(
@@ -184,34 +186,46 @@ export default function OverviewTab({ feedings, weeklyFeedings: weeklyFeedingsRa
         <div className="fade-in fade-in-2">
           <SectionCard title="Breast Feeding" icon={<Icons.Heart />} color={colors.feeding}>
             <div style={{ display: "grid", gap: 12 }}>
-              <div>
-                <div style={{ color: "var(--text-dim)", fontSize: 11, textTransform: "uppercase", letterSpacing: 0.5 }}>
-                  Last breast used
+              <div style={{ color: "var(--text-dim)", fontSize: 11, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                Last breast used
+              </div>
+              <div style={{ color: colors.feeding, fontSize: 28, fontWeight: 700 }}>
+                {lastBreast ? lastBreast.breast : "—"}
+              </div>
+              <div style={{ color: "var(--text-muted)", fontSize: 12 }}>
+                {lastBreast ? `${lastBreast.method} · ${formatTime(lastBreast.time)}` : "No breast feedings found"}
+              </div>
+            </div>
+          </SectionCard>
+        </div>
+
+        <div className="fade-in fade-in-3">
+          <SectionCard title="Milk & Vitamins" icon={<Icons.Bottle />} color={colors.tummy}>
+            <div style={{ display: "grid", gap: 12 }}>
+              <div style={{ color: "var(--text-dim)", fontSize: 11, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                Last 24 hours
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                <div>
+                  <div style={{ color: "var(--text-muted)", fontSize: 12 }}>Breast milk</div>
+                  <div style={{ color: colors.feeding, fontSize: 22, fontWeight: 700 }}>
+                    {Math.round(milkTotals.breastMilk)} {units.volume}
+                  </div>
                 </div>
-                <div style={{ color: colors.feeding, fontSize: 24, fontWeight: 700 }}>
-                  {lastBreast ? lastBreast.breast : "—"}
-                </div>
-                <div style={{ color: "var(--text-muted)", fontSize: 12 }}>
-                  {lastBreast ? `${lastBreast.method} · ${formatTime(lastBreast.time)}` : "No breast feedings found"}
+                <div>
+                  <div style={{ color: "var(--text-muted)", fontSize: 12 }}>Formula</div>
+                  <div style={{ color: colors.tummy, fontSize: 22, fontWeight: 700 }}>
+                    {Math.round(milkTotals.formula)} {units.volume}
+                  </div>
                 </div>
               </div>
               <div style={{ borderTop: "1px solid var(--border)", paddingTop: 12 }}>
-                <div style={{ color: "var(--text-dim)", fontSize: 11, textTransform: "uppercase", letterSpacing: 0.5 }}>
-                  Last 24 hours
+                <div style={{ color: "var(--text-muted)", fontSize: 12 }}>Vitamin guidance</div>
+                <div style={{ color: colors.temp, fontSize: 18, fontWeight: 700 }}>
+                  {vitaminRecommendation.label}
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 8 }}>
-                  <div>
-                    <div style={{ color: "var(--text-muted)", fontSize: 12 }}>Breast milk</div>
-                    <div style={{ color: colors.feeding, fontSize: 20, fontWeight: 700 }}>
-                      {Math.round(milkTotals.breastMilk)} {units.volume}
-                    </div>
-                  </div>
-                  <div>
-                    <div style={{ color: "var(--text-muted)", fontSize: 12 }}>Formula</div>
-                    <div style={{ color: colors.tummy, fontSize: 20, fontWeight: 700 }}>
-                      {Math.round(milkTotals.formula)} {units.volume}
-                    </div>
-                  </div>
+                <div style={{ color: "var(--text-dim)", fontSize: 12, marginTop: 4 }}>
+                  {vitaminRecommendation.detail}
                 </div>
               </div>
             </div>

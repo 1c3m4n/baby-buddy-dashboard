@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import {
   calculateFeedingAmounts,
   getLastBreastUsed,
+  getVitaminRecommendation,
   summarizeMilkByType,
 } from "../src/utils/feedingInsights.js";
 
@@ -45,5 +46,15 @@ assert.deepEqual(
   ),
   { breastMilk: 100, formula: 90 }
 );
+
+assert.deepEqual(getVitaminRecommendation({ breastMilk: 120, formula: 501 }), {
+  label: "Vitamin D only",
+  detail: "No vitamin K needed because formula is above 500 mL in the last 24 hours.",
+});
+
+assert.deepEqual(getVitaminRecommendation({ breastMilk: 120, formula: 500 }), {
+  label: "Vitamin K + D required",
+  detail: "Formula is 500 mL or less in the last 24 hours.",
+});
 
 console.log("feeding insight checks passed");

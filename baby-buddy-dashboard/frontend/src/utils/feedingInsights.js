@@ -67,3 +67,17 @@ export function summarizeMilkByType(feedings, now = new Date()) {
     { breastMilk: 0, formula: 0 }
   );
 }
+
+export function getVitaminRecommendation(milkTotals) {
+  if ((milkTotals?.formula || 0) > 500) {
+    return {
+      label: "Vitamin D only",
+      detail: "No vitamin K needed because formula is above 500 mL in the last 24 hours.",
+    };
+  }
+
+  return {
+    label: "Vitamin K + D required",
+    detail: "Formula is 500 mL or less in the last 24 hours.",
+  };
+}
