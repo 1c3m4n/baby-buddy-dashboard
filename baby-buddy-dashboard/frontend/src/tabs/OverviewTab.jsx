@@ -35,11 +35,15 @@ import {
   getVitaminRecommendation,
   summarizeMilkByType,
 } from "../utils/feedingInsights";
+import {
+  summarizeVitaminMedication,
+  getDefaultVitaminMedicationName,
+} from "../utils/medicationInsights";
 import { useUnits } from "../utils/units";
 
 const COLLAPSED_COUNT = 2;
 
-export default function OverviewTab({ feedings, weeklyFeedings: weeklyFeedingsRaw, pumpings = [], sleepEntries, weeklySleep, changes, tummyTimes, weeklyTummyTimes, weights, onEditEntry }) {
+export default function OverviewTab({ feedings, weeklyFeedings: weeklyFeedingsRaw, pumpings = [], medication = [], sleepEntries, weeklySleep, changes, tummyTimes, weeklyTummyTimes, weights, onEditEntry, onLogVitamins }) {
   const units = useUnits();
   const [expanded, setExpanded] = useState({});
   const [dayModal, setDayModal] = useState(null);
@@ -57,6 +61,8 @@ export default function OverviewTab({ feedings, weeklyFeedings: weeklyFeedingsRa
   const lastBreast = getLastBreastUsed(weeklyFeedingsRaw);
   const milkTotals = summarizeMilkByType(weeklyFeedingsRaw);
   const vitaminRecommendation = getVitaminRecommendation(milkTotals);
+  const vitaminMedication = summarizeVitaminMedication(medication);
+  const defaultVitaminName = getDefaultVitaminMedicationName(milkTotals);
 
   const totalFeeding = feedings.reduce((s, f) => s + (f.amount || 0), 0);
   const totalSleep = sleepEntries.reduce(
@@ -229,6 +235,50 @@ export default function OverviewTab({ feedings, weeklyFeedings: weeklyFeedingsRa
                 <div style={{ color: "var(--text-dim)", fontSize: 12, marginTop: 4 }}>
                   {vitaminRecommendation.detail}
                 </div>
+              </div>
+              <div style={{ borderTop: "1px solid var(--border)", paddingTop: 12 }}>
+                <div style={{ color: "var(--text-muted)", fontSize: 12 }}>Vitamin log</div>
+                <button
+                  type="button"
+                  className={vitaminMedication.last ? "entry-clickable" : ""}
+                  onClick={() => vitaminMedication.last && onEditEntry?.("vitamins", vitaminMedication.last)}
+                  style={{
+                    display: "block",
+                    width: "100%",
+                    textAlign: "left",
+                    background: "transparent",
+                    border: "none",
+                    padding: 0,
+                    cursor: vitaminMedication.last ? "pointer" : "default",
+                    fontFamily: "inherit",
+                  }}
+                >
+                  <div style={{ color: vitaminMedication.takenToday ? colors.tummy : "var(--text-muted)", fontSize: 16, fontWeight: 700 }}>
+                    {vitaminMedication.takenToday ? "Logged today" : "Not logged today"}
+                  </div>
+                  <div style={{ color: "var(--text-dim)", fontSize: 12, marginTop: 4 }}>
+                    {vitaminMedication.last
+                      ? `${vitaminMedication.last.name} · ${formatTime(vitaminMedication.last.time)}`
+                      : "No vitamin medication record found today"}
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onLogVitamins?.(defaultVitaminName)}
+                  style={{
+                    marginTop: 10,
+                    border: `1px solid ${colors.temp}`,
+                    background: `${colors.temp}18`,
+                    color: colors.temp,
+                    borderRadius: 10,
+                    padding: "8px 10px",
+                    fontSize: 12,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                  }}
+                >
+                  Log {defaultVitaminName}
+                </button>
               </div>
             </div>
           </SectionCard>

@@ -63,6 +63,21 @@ function emmaPumpings() {
   ];
 }
 
+function emmaMedication() {
+  return [
+    {
+      id: 9001,
+      child: 1,
+      name: "Vitamin D",
+      dosage: null,
+      dosage_unit: "drops",
+      time: isoLocal(hoursAgo(2)),
+      notes: "Demo vitamin record",
+      tags: ["vitamins"],
+    },
+  ];
+}
+
 function emmaWeeklyFeedings() {
   const entries = [...emmaFeedings()];
   const amounts = [480, 520, 460, 500, 490, 510, 0];
@@ -203,6 +218,10 @@ function liamPumpings() {
   return [];
 }
 
+function liamMedication() {
+  return [];
+}
+
 function liamWeeklyFeedings() {
   const entries = [...liamFeedings()];
   for (let d = 1; d <= 6; d++) {
@@ -317,6 +336,7 @@ function emmaData() {
     feedings: emmaFeedings(),
     weeklyFeedings: emmaWeeklyFeedings(),
     pumpings: emmaPumpings(),
+    medication: emmaMedication(),
     sleepEntries: emmaSleep(),
     weeklySleep: emmaWeeklySleep(),
     changes: emmaChanges(),
@@ -349,6 +369,7 @@ function liamData() {
     feedings: liamFeedings(),
     weeklyFeedings: liamWeeklyFeedings(),
     pumpings: liamPumpings(),
+    medication: liamMedication(),
     sleepEntries: liamSleep(),
     weeklySleep: liamWeeklySleep(),
     changes: liamChanges(),

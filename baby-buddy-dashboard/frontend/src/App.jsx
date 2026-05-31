@@ -14,6 +14,7 @@ import DiaperForm from "./components/forms/DiaperForm";
 import TemperatureForm from "./components/forms/TemperatureForm";
 import TummyTimeForm from "./components/forms/TummyTimeForm";
 import PumpingForm from "./components/forms/PumpingForm";
+import MedicationForm from "./components/forms/MedicationForm";
 import NoteForm from "./components/forms/NoteForm";
 import WeightForm from "./components/forms/WeightForm";
 import HeightForm from "./components/forms/HeightForm";
@@ -40,6 +41,7 @@ const ACTION_GROUPS = [
     label: "Measure",
     actions: [
       { id: "temp", label: "Temp", icon: <Icons.Temp />, color: colors.temp },
+      { id: "vitamins", label: "Vitamins", icon: <Icons.Temp />, color: colors.temp },
       { id: "weight", label: "Weight", icon: <Icons.Weight />, color: colors.growth },
       { id: "height", label: "Height", icon: <Icons.Ruler />, color: colors.height },
     ],
@@ -230,6 +232,7 @@ export default function App() {
             feedings={data.feedings}
             weeklyFeedings={data.weeklyFeedings}
             pumpings={data.pumpings}
+            medication={data.medication}
             sleepEntries={data.sleepEntries}
             weeklySleep={data.weeklySleep}
             changes={data.changes}
@@ -237,6 +240,7 @@ export default function App() {
             weeklyTummyTimes={data.weeklyTummyTimes}
             weights={data.weights}
             onEditEntry={(type, entry) => setModal({ type, entry })}
+            onLogVitamins={(defaultName) => setModal({ type: "vitamins", defaultName })}
           />
         )}
         {activeTab === "growth" && (
@@ -371,6 +375,15 @@ export default function App() {
         <TemperatureForm
           childId={data.child?.id}
           entry={modal.entry}
+          onDone={handleFormDone}
+          onClose={closeModal}
+        />
+      )}
+      {modal?.type === "vitamins" && (
+        <MedicationForm
+          childId={data.child?.id}
+          entry={modal.entry}
+          defaultName={modal.defaultName}
           onDone={handleFormDone}
           onClose={closeModal}
         />

@@ -88,6 +88,13 @@ export const api = {
   updatePumping: (id, data) =>
     request(`pumping/${id}/`, { method: "PATCH", body: JSON.stringify(data) }),
 
+  // Medication
+  getMedication: (params) => request(`medication/${qs(params)}`),
+  createMedication: (data) =>
+    request("medication/", { method: "POST", body: JSON.stringify(data) }),
+  updateMedication: (id, data) =>
+    request(`medication/${id}/`, { method: "PATCH", body: JSON.stringify(data) }),
+
   // Notes
   getNotes: (params) => request(`notes/${qs(params)}`),
   createNote: (data) =>
