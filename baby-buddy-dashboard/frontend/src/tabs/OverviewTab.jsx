@@ -19,6 +19,7 @@ import { Icons } from "../components/Icons";
 import { colors } from "../utils/colors";
 import {
   toFeedingTimeline,
+  toPumpingTimeline,
   toDiaperTimeline,
   toSleepBlocks,
   aggregateByDayOfWeek,
@@ -38,7 +39,7 @@ import { useUnits } from "../utils/units";
 
 const COLLAPSED_COUNT = 2;
 
-export default function OverviewTab({ feedings, weeklyFeedings: weeklyFeedingsRaw, sleepEntries, weeklySleep, changes, tummyTimes, weeklyTummyTimes, weights, onEditEntry }) {
+export default function OverviewTab({ feedings, weeklyFeedings: weeklyFeedingsRaw, pumpings = [], sleepEntries, weeklySleep, changes, tummyTimes, weeklyTummyTimes, weights, onEditEntry }) {
   const units = useUnits();
   const [expanded, setExpanded] = useState({});
   const [dayModal, setDayModal] = useState(null);
@@ -46,6 +47,7 @@ export default function OverviewTab({ feedings, weeklyFeedings: weeklyFeedingsRa
   const toggle = (key) => setExpanded((prev) => ({ ...prev, [key]: !prev[key] }));
 
   const feedingTimeline = toFeedingTimeline(feedings, units.volume);
+  const pumpingTimeline = toPumpingTimeline(pumpings, units.volume);
   const diaperTimeline = toDiaperTimeline(changes);
   const sleepBlocks = toSleepBlocks(sleepEntries);
   const weeklyFeedings = aggregateByDayOfWeek(weeklyFeedingsRaw, "amount");
@@ -296,8 +298,38 @@ export default function OverviewTab({ feedings, weeklyFeedings: weeklyFeedingsRa
           </SectionCard>
         </div>
 
-        {/* Sleep */}
+        {/* Pumping Timeline */}
         <div className="fade-in fade-in-4">
+          <SectionCard title="Recent Pumpings" icon={<Icons.Pump />} color={colors.pumping}>
+            {pumpingTimeline.length > 0 ? (
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                {(expanded.pumpings ? pumpingTimeline : pumpingTimeline.slice(0, COLLAPSED_COUNT)).map((p, i, arr) => (
+                  <div key={i} className="entry-clickable" onClick={() => onEditEntry?.("pumping", p.entry)}>
+                    <TimelineItem
+                      time={p.time}
+                      label={p.label}
+                      detail={p.detail}
+                      color={colors.pumping}
+                      isLast={i === arr.length - 1}
+                    />
+                  </div>
+                ))}
+                {pumpingTimeline.length > COLLAPSED_COUNT && (
+                  <button className="expand-toggle" onClick={() => toggle("pumpings")}>
+                    {expanded.pumpings ? "Show less" : `Show ${pumpingTimeline.length - COLLAPSED_COUNT} more`}
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div style={{ color: "var(--text-dim)", fontSize: 13, textAlign: "center", padding: 20 }}>
+                No pumping recorded today
+              </div>
+            )}
+          </SectionCard>
+        </div>
+
+        {/* Sleep */}
+        <div className="fade-in fade-in-5">
           <SectionCard title="Sleep Pattern" icon={<Icons.Moon />} color={colors.sleep}>
             {sleepBlocks.length > 0 ? (
               <div style={{ display: "flex", flexDirection: "column" }}>

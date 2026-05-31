@@ -56,6 +56,13 @@ function emmaFeedings() {
   ];
 }
 
+function emmaPumpings() {
+  return [
+    { id: 1, child: 1, start: isoLocal(hoursAgo(2, 30)), end: isoLocal(hoursAgo(2, 10)), amount: 85, duration: duration(0, 20), notes: "Morning pump" },
+    { id: 2, child: 1, start: isoLocal(hoursAgo(6)), end: isoLocal(hoursAgo(5, 42)), amount: 70, duration: duration(0, 18), notes: "" },
+  ];
+}
+
 function emmaWeeklyFeedings() {
   const entries = [...emmaFeedings()];
   const amounts = [480, 520, 460, 500, 490, 510, 0];
@@ -192,6 +199,10 @@ function liamFeedings() {
   ];
 }
 
+function liamPumpings() {
+  return [];
+}
+
 function liamWeeklyFeedings() {
   const entries = [...liamFeedings()];
   for (let d = 1; d <= 6; d++) {
@@ -305,6 +316,7 @@ function emmaData() {
   return {
     feedings: emmaFeedings(),
     weeklyFeedings: emmaWeeklyFeedings(),
+    pumpings: emmaPumpings(),
     sleepEntries: emmaSleep(),
     weeklySleep: emmaWeeklySleep(),
     changes: emmaChanges(),
@@ -336,6 +348,7 @@ function liamData() {
   return {
     feedings: liamFeedings(),
     weeklyFeedings: liamWeeklyFeedings(),
+    pumpings: liamPumpings(),
     sleepEntries: liamSleep(),
     weeklySleep: liamWeeklySleep(),
     changes: liamChanges(),

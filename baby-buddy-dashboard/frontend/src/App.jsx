@@ -229,6 +229,7 @@ export default function App() {
           <OverviewTab
             feedings={data.feedings}
             weeklyFeedings={data.weeklyFeedings}
+            pumpings={data.pumpings}
             sleepEntries={data.sleepEntries}
             weeklySleep={data.weeklySleep}
             changes={data.changes}

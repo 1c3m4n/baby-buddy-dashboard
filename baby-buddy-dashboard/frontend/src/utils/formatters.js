@@ -69,6 +69,22 @@ export function toFeedingTimeline(feedings, volumeUnit = "mL") {
   }));
 }
 
+export function toPumpingTimeline(pumpings = [], volumeUnit = "mL") {
+  return pumpings.map((p) => {
+    const duration = p.duration || (p.start && p.end
+      ? `${Math.floor((new Date(p.end) - new Date(p.start)) / 3600000)}:${String(Math.round(((new Date(p.end) - new Date(p.start)) % 3600000) / 60000)).padStart(2, "0")}`
+      : null);
+    const notes = p.notes ? ` · ${p.notes}` : "";
+    return {
+      time: formatTime(p.end || p.start),
+      label: `${p.amount ? `${p.amount} ${volumeUnit}` : "Amount not set"} pumped`,
+      detail: `${formatDuration(duration)} · ${timeAgo(p.end || p.start)}${notes}`,
+      amount: p.amount || 0,
+      entry: p,
+    };
+  });
+}
+
 export function toDiaperTimeline(changes) {
   return changes.map((c) => ({
     time: formatTime(c.time),
