@@ -3,6 +3,7 @@ import {
   calculateFeedingAmounts,
   getLastBreastUsed,
   getVitaminRecommendation,
+  summarizeFeedingMethods,
   summarizeMilkByType,
 } from "../src/utils/feedingInsights.js";
 
@@ -39,6 +40,25 @@ assert.deepEqual(
 );
 
 assert.equal(getLastBreastUsed([{ start: "2026-05-30T09:00:00Z", method: "bottle" }]), null);
+
+assert.deepEqual(
+  summarizeFeedingMethods([
+    { method: "bottle", amount: 60 },
+    { method: "left breast" },
+    { method: "right breast", amount: null },
+    { method: "both breasts", amount: 10 },
+    { method: "parent fed", amount: 20 },
+  ]),
+  { bottle: 1, breast: 3, other: 1, total: 5, bottleAmount: 60 }
+);
+
+assert.deepEqual(summarizeFeedingMethods(null), {
+  bottle: 0,
+  breast: 0,
+  other: 0,
+  total: 0,
+  bottleAmount: 0,
+});
 
 assert.deepEqual(
   summarizeMilkByType(

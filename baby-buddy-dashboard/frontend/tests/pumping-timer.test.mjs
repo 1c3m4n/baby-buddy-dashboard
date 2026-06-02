@@ -22,6 +22,14 @@ assert.match(
   'Timer names containing pump should map to the pumping modal'
 );
 
+const trackGroupMatch = appSource.match(/label:\s*["']Track["'],[\s\S]*?(?=\n\s*\},\n\s*\{\n\s*label:\s*["']Measure["'])/);
+assert.ok(trackGroupMatch, 'App should define a Track quick action group');
+assert.match(
+  trackGroupMatch[0],
+  /id:\s*["']pumping["'][\s\S]*label:\s*["']Pumping["']/,
+  'Quick action tracker should include Pumping so pumping sessions can be logged without a timer'
+);
+
 assert.match(
   appSource,
   /modal\?\.type\s*===\s*["']pumping["'][\s\S]*<PumpingForm[\s\S]*timerId=\{modal\.timerId\}/,

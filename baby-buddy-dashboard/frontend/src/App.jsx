@@ -32,6 +32,7 @@ const ACTION_GROUPS = [
     label: "Track",
     actions: [
       { id: "feeding", label: "Feeding", icon: <Icons.Bottle />, color: colors.feeding },
+      { id: "pumping", label: "Pumping", icon: <Icons.Pump />, color: colors.pumping },
       { id: "sleep", label: "Sleep", icon: <Icons.Moon />, color: colors.sleep },
       { id: "diaper", label: "Diaper", icon: <Icons.Droplet />, color: colors.diaper },
       { id: "tummy", label: "Tummy", icon: <Icons.Sun />, color: colors.tummy },

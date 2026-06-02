@@ -33,6 +33,7 @@ import {
   calculateFeedingAmounts,
   getLastBreastUsed,
   getVitaminRecommendation,
+  summarizeFeedingMethods,
   summarizeMilkByType,
 } from "../utils/feedingInsights";
 import {
@@ -63,8 +64,8 @@ export default function OverviewTab({ feedings, weeklyFeedings: weeklyFeedingsRa
   const vitaminRecommendation = getVitaminRecommendation(milkTotals);
   const vitaminMedication = summarizeVitaminMedication(medication);
   const defaultVitaminName = getDefaultVitaminMedicationName(milkTotals);
+  const feedingMethods = summarizeFeedingMethods(feedings);
 
-  const totalFeeding = feedings.reduce((s, f) => s + (f.amount || 0), 0);
   const totalSleep = sleepEntries.reduce(
     (s, e) => s + parseDuration(e.duration),
     0
@@ -115,8 +116,12 @@ export default function OverviewTab({ feedings, weeklyFeedings: weeklyFeedingsRa
           <StatCard
             icon={<Icons.Bottle />}
             label="Feedings"
-            value={totalFeeding > 0 ? `${Math.round(totalFeeding)} ${units.volume}` : `${feedings.length}`}
-            sub={`${feedings.length} feeding${feedings.length !== 1 ? "s" : ""} today`}
+            value={`${feedingMethods.bottle} bottle · ${feedingMethods.breast} breast`}
+            sub={[
+              `${feedingMethods.total} feeding${feedingMethods.total !== 1 ? "s" : ""} today`,
+              feedingMethods.other ? `${feedingMethods.other} other` : null,
+              feedingMethods.bottleAmount ? `${Math.round(feedingMethods.bottleAmount)} ${units.volume} bottle` : null,
+            ].filter(Boolean).join(" · ")}
             color={colors.feeding}
           />
         </div>

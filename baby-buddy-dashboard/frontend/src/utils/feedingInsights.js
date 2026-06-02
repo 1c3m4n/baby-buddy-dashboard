@@ -50,6 +50,26 @@ export function getLastBreastUsed(feedings) {
   };
 }
 
+export function summarizeFeedingMethods(feedings) {
+  return (feedings || []).reduce(
+    (totals, feeding) => {
+      const method = String(feeding?.method || "").toLowerCase();
+      const amount = toNumber(feeding?.amount) || 0;
+      totals.total += 1;
+      if (method.includes("bottle")) {
+        totals.bottle += 1;
+        totals.bottleAmount += amount;
+      } else if (formatBreast(method)) {
+        totals.breast += 1;
+      } else {
+        totals.other += 1;
+      }
+      return totals;
+    },
+    { bottle: 0, breast: 0, other: 0, total: 0, bottleAmount: 0 }
+  );
+}
+
 export function summarizeMilkByType(feedings, now = new Date()) {
   const since = now.getTime() - 24 * 60 * 60 * 1000;
   return (feedings || []).reduce(
