@@ -34,8 +34,20 @@ assert.match(
 
 assert.match(
   hookSource,
+  /const\s+\[weeklyPumpings,\s*setWeeklyPumpings\]\s*=\s*useState\(\[\]\)/,
+  "useBabyData should keep weekly pumping entries in state for daily totals"
+);
+
+assert.match(
+  hookSource,
   /api\.getPumping\(\{\s*child:\s*c,\s*start_min:\s*todayMin,\s*start_max:\s*todayMax,\s*limit:\s*100,\s*ordering:\s*["']-start["']\s*\}\)/,
   "useBabyData should fetch today's pumping entries"
+);
+
+assert.match(
+  hookSource,
+  /api\.getPumping\(\{\s*child:\s*c,\s*start_min:\s*weekMin,\s*limit:\s*200,\s*ordering:\s*["']-start["']\s*\}\)/,
+  "useBabyData should fetch weekly pumping entries for the daily pumping totals card"
 );
 
 assert.match(
@@ -46,8 +58,20 @@ assert.match(
 
 assert.match(
   hookSource,
+  /setWeeklyPumpings\(weeklyPumpingRes\.results\s*\|\|\s*\[\]\)/,
+  "useBabyData should store weekly pumping results"
+);
+
+assert.match(
+  hookSource,
   /pumpings,/,
   "useBabyData should return pumpings"
+);
+
+assert.match(
+  hookSource,
+  /weeklyPumpings,/,
+  "useBabyData should return weekly pumpings"
 );
 
 assert.match(
@@ -58,8 +82,20 @@ assert.match(
 
 assert.match(
   mockSource,
+  /weeklyPumpings:\s*emmaWeeklyPumpings\(\)/,
+  "demo data should include Emma weekly pumping entries"
+);
+
+assert.match(
+  mockSource,
   /pumpings:\s*liamPumpings\(\)/,
   "demo data should include Liam pumping entries"
+);
+
+assert.match(
+  mockSource,
+  /weeklyPumpings:\s*liamPumpings\(\)/,
+  "demo data should include Liam weekly pumping entries"
 );
 
 assert.match(
@@ -70,8 +106,20 @@ assert.match(
 
 assert.match(
   overviewSource,
+  /const\s+pumpingByDay\s*=\s*aggregateByDayOfWeek\(weeklyPumpings,\s*["']amount["']\)/,
+  "OverviewTab should aggregate weekly pumpings into daily pumping totals"
+);
+
+assert.match(
+  overviewSource,
   /Recent Pumpings/,
   "OverviewTab should render a Recent Pumpings card"
+);
+
+assert.match(
+  overviewSource,
+  /Daily Pumping Amounts/,
+  "OverviewTab should render a bottom Daily Pumping Amounts card"
 );
 
 assert.match(
@@ -84,6 +132,12 @@ assert.match(
   appSource,
   /pumpings=\{data\.pumpings\}/,
   "App should pass pumpings into OverviewTab"
+);
+
+assert.match(
+  appSource,
+  /weeklyPumpings=\{data\.weeklyPumpings\}/,
+  "App should pass weekly pumpings into OverviewTab"
 );
 
 console.log("pumping timeline checks passed");

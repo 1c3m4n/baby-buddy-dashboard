@@ -44,7 +44,7 @@ import { useUnits } from "../utils/units";
 
 const COLLAPSED_COUNT = 2;
 
-export default function OverviewTab({ feedings, weeklyFeedings: weeklyFeedingsRaw, pumpings = [], medication = [], sleepEntries, weeklySleep, changes, tummyTimes, weeklyTummyTimes, weights, onEditEntry, onLogVitamins }) {
+export default function OverviewTab({ feedings, weeklyFeedings: weeklyFeedingsRaw, pumpings = [], weeklyPumpings = [], medication = [], sleepEntries, weeklySleep, changes, tummyTimes, weeklyTummyTimes, weights, onEditEntry, onLogVitamins }) {
   const units = useUnits();
   const [expanded, setExpanded] = useState({});
   const [dayModal, setDayModal] = useState(null);
@@ -56,6 +56,7 @@ export default function OverviewTab({ feedings, weeklyFeedings: weeklyFeedingsRa
   const diaperTimeline = toDiaperTimeline(changes);
   const sleepBlocks = toSleepBlocks(sleepEntries);
   const weeklyFeedings = aggregateByDayOfWeek(weeklyFeedingsRaw, "amount");
+  const pumpingByDay = aggregateByDayOfWeek(weeklyPumpings, "amount");
   const sleepByDay = aggregateSleepByDay(weeklySleep);
   const tummyByDay = aggregateTummyByDay(weeklyTummyTimes);
   const feedingAmounts = calculateFeedingAmounts(weights);
@@ -92,6 +93,8 @@ export default function OverviewTab({ feedings, weeklyFeedings: weeklyFeedingsRa
     let dayData = [];
     if (type === "feeding") {
       dayData = getEntriesForDay(weeklyFeedingsRaw, day, "start");
+    } else if (type === "pumping") {
+      dayData = getEntriesForDay(weeklyPumpings, day, "start");
     } else if (type === "sleep") {
       dayData = getEntriesForDay(weeklySleep, day, "start");
     } else if (type === "tummy") {
@@ -558,6 +561,63 @@ export default function OverviewTab({ feedings, weeklyFeedings: weeklyFeedingsRa
             ) : (
               <div style={{ color: "var(--text-dim)", fontSize: 13, textAlign: "center", padding: 20 }}>
                 No tummy time recorded today
+              </div>
+            )}
+          </SectionCard>
+        </div>
+
+        {/* Daily Pumping Amounts */}
+        <div className="fade-in fade-in-6" style={{ gridColumn: "1 / -1" }}>
+          <SectionCard title="Daily Pumping Amounts" icon={<Icons.Pump />} color={colors.pumping}>
+            {pumpingByDay.some((d) => d.amount > 0) ? (
+              <>
+                <div style={{ height: 140 }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={pumpingByDay} barSize={22} onClick={(data) => handleChartClick(data, "pumping")}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#252836" vertical={false} />
+                      <XAxis dataKey="day" tick={{ fontSize: 11, fill: "#5A6178" }} axisLine={false} tickLine={false} />
+                      <YAxis hide />
+                      <Tooltip content={<CustomTooltip />} />
+                      <Bar dataKey="amount" fill={colors.pumping} radius={[6, 6, 0, 0]} opacity={0.85} cursor="pointer" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+                {selectedBar?.type === "pumping" ? (
+                  <ChartDetailBar
+                    label={selectedBar.label}
+                    value={selectedBar.value}
+                    unit={units.volume}
+                    color={colors.pumping}
+                    onViewEntries={() => openDayModal(selectedBar.label, "pumping")}
+                    onDismiss={() => setSelectedBar(null)}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      marginTop: 12,
+                      display: "flex",
+                      gap: 12,
+                      alignItems: "center",
+                      padding: "10px 14px",
+                      borderRadius: 10,
+                      background: `${colors.pumping}08`,
+                      border: `1px solid ${colors.pumping}15`,
+                    }}
+                  >
+                    <Icons.TrendUp />
+                    <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
+                      Today{" "}
+                      <strong style={{ color: colors.pumping }}>
+                        {Math.round(pumpings.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0))} {units.volume}
+                      </strong>{" "}
+                      pumped
+                    </span>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div style={{ color: "var(--text-dim)", fontSize: 13, textAlign: "center", padding: 20 }}>
+                No pumping amounts recorded this week
               </div>
             )}
           </SectionCard>

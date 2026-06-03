@@ -25,6 +25,7 @@ export function useBabyData() {
   const [feedings, setFeedings] = useState([]);
   const [weeklyFeedings, setWeeklyFeedings] = useState([]);
   const [pumpings, setPumpings] = useState([]);
+  const [weeklyPumpings, setWeeklyPumpings] = useState([]);
   const [medication, setMedication] = useState([]);
   const [sleepEntries, setSleepEntries] = useState([]);
   const [weeklySleep, setWeeklySleep] = useState([]);
@@ -70,6 +71,7 @@ export function useBabyData() {
         feedingsRes,
         weeklyFeedingsRes,
         pumpingRes,
+        weeklyPumpingRes,
         medicationRes,
         sleepRes,
         weeklySleepRes,
@@ -87,6 +89,7 @@ export function useBabyData() {
         api.getFeedings({ child: c, start_min: todayMin, start_max: todayMax, limit: 100, ordering: "-start" }),
         api.getFeedings({ child: c, start_min: weekMin, limit: 200, ordering: "-start" }),
         api.getPumping({ child: c, start_min: todayMin, start_max: todayMax, limit: 100, ordering: "-start" }),
+        api.getPumping({ child: c, start_min: weekMin, limit: 200, ordering: "-start" }),
         api.getMedication({ child: c, date_min: todayMin, date_max: todayMax, limit: 100, ordering: "-time" }),
         api.getSleep({ child: c, start_min: sleepMin, limit: 100, ordering: "-start" }),
         api.getSleep({ child: c, start_min: weekMin, limit: 200, ordering: "-start" }),
@@ -105,6 +108,7 @@ export function useBabyData() {
       setFeedings(feedingsRes.results || []);
       setWeeklyFeedings(weeklyFeedingsRes.results || []);
       setPumpings(pumpingRes.results || []);
+      setWeeklyPumpings(weeklyPumpingRes.results || []);
       setMedication(medicationRes.results || []);
       setSleepEntries(sleepRes.results || []);
       setWeeklySleep(weeklySleepRes.results || []);
@@ -166,6 +170,7 @@ export function useBabyData() {
     setFeedings(mock.feedings);
     setWeeklyFeedings(mock.weeklyFeedings);
     setPumpings(mock.pumpings);
+    setWeeklyPumpings(mock.weeklyPumpings);
     setMedication(mock.medication);
     setSleepEntries(mock.sleepEntries);
     setWeeklySleep(mock.weeklySleep);
@@ -193,6 +198,7 @@ export function useBabyData() {
       setFeedings(mock.feedings);
       setWeeklyFeedings(mock.weeklyFeedings);
       setPumpings(mock.pumpings);
+      setWeeklyPumpings(mock.weeklyPumpings);
       setMedication(mock.medication);
       setSleepEntries(mock.sleepEntries);
       setWeeklySleep(mock.weeklySleep);
@@ -241,6 +247,7 @@ export function useBabyData() {
     feedings,
     weeklyFeedings,
     pumpings,
+    weeklyPumpings,
     medication,
     sleepEntries,
     weeklySleep,

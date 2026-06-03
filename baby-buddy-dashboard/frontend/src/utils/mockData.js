@@ -63,6 +63,32 @@ function emmaPumpings() {
   ];
 }
 
+function emmaWeeklyPumpings() {
+  const entries = [...emmaPumpings()];
+  const amounts = [150, 140, 165, 130, 175, 155];
+  for (let d = 1; d <= 6; d++) {
+    const base = daysAgo(d);
+    const dailyAmount = amounts[d - 1];
+    const firstStart = new Date(base);
+    firstStart.setHours(7, 30);
+    const secondStart = new Date(base);
+    secondStart.setHours(19, 15);
+    [firstStart, secondStart].forEach((start, i) => {
+      const end = new Date(start.getTime() + (18 + i * 2) * 60000);
+      entries.push({
+        id: 300 + d * 10 + i,
+        child: 1,
+        start: isoLocal(start),
+        end: isoLocal(end),
+        amount: Math.round(dailyAmount / 2),
+        duration: duration(0, 18 + i * 2),
+        notes: i === 0 ? "Morning pump" : "Evening pump",
+      });
+    });
+  }
+  return entries;
+}
+
 function emmaMedication() {
   return [
     {
@@ -336,6 +362,7 @@ function emmaData() {
     feedings: emmaFeedings(),
     weeklyFeedings: emmaWeeklyFeedings(),
     pumpings: emmaPumpings(),
+    weeklyPumpings: emmaWeeklyPumpings(),
     medication: emmaMedication(),
     sleepEntries: emmaSleep(),
     weeklySleep: emmaWeeklySleep(),
@@ -369,6 +396,7 @@ function liamData() {
     feedings: liamFeedings(),
     weeklyFeedings: liamWeeklyFeedings(),
     pumpings: liamPumpings(),
+    weeklyPumpings: liamPumpings(),
     medication: liamMedication(),
     sleepEntries: liamSleep(),
     weeklySleep: liamWeeklySleep(),
