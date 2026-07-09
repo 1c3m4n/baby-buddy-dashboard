@@ -33,6 +33,7 @@ import {
   calculateFeedingAmounts,
   getLastBreastUsed,
   getVitaminRecommendation,
+  getHoursSinceLastFeeding,
   summarizeFeedingMethods,
   summarizeMilkByType,
 } from "../utils/feedingInsights";
@@ -66,6 +67,7 @@ export default function OverviewTab({ feedings, weeklyFeedings: weeklyFeedingsRa
   const vitaminMedication = summarizeVitaminMedication(medication);
   const defaultVitaminName = getDefaultVitaminMedicationName(milkTotals);
   const feedingMethods = summarizeFeedingMethods(feedings);
+  const hoursSinceLastFeeding = getHoursSinceLastFeeding(feedings);
 
   const totalSleep = sleepEntries.reduce(
     (s, e) => s + parseDuration(e.duration),
@@ -119,7 +121,11 @@ export default function OverviewTab({ feedings, weeklyFeedings: weeklyFeedingsRa
           <StatCard
             icon={<Icons.Bottle />}
             label="Feedings"
-            value={`${feedingMethods.bottle} bottle · ${feedingMethods.breast} breast`}
+            value={feedingMethods.breast
+              ? `${feedingMethods.bottle} bottle · ${feedingMethods.breast} breast`
+              : hoursSinceLastFeeding != null
+                ? `${feedingMethods.bottle} bottle · ${hoursSinceLastFeeding.toFixed(1)}h since last feeding`
+                : `${feedingMethods.bottle} bottle · no feedings yet`}
             sub={[
               `${feedingMethods.total} feeding${feedingMethods.total !== 1 ? "s" : ""} today`,
               feedingMethods.other ? `${feedingMethods.other} other` : null,
@@ -196,22 +202,6 @@ export default function OverviewTab({ feedings, weeklyFeedings: weeklyFeedingsRa
                 Add a weight entry to calculate feeding amounts
               </div>
             )}
-          </SectionCard>
-        </div>
-
-        <div className="fade-in fade-in-2">
-          <SectionCard title="Breast Feeding" icon={<Icons.Heart />} color={colors.feeding}>
-            <div style={{ display: "grid", gap: 12 }}>
-              <div style={{ color: "var(--text-dim)", fontSize: 11, textTransform: "uppercase", letterSpacing: 0.5 }}>
-                Last breast used
-              </div>
-              <div style={{ color: colors.feeding, fontSize: 28, fontWeight: 700 }}>
-                {lastBreast ? lastBreast.breast : "—"}
-              </div>
-              <div style={{ color: "var(--text-muted)", fontSize: 12 }}>
-                {lastBreast ? `${lastBreast.method} · ${formatTime(lastBreast.time)}` : "No breast feedings found"}
-              </div>
-            </div>
           </SectionCard>
         </div>
 
@@ -383,6 +373,22 @@ export default function OverviewTab({ feedings, weeklyFeedings: weeklyFeedingsRa
                 No pumping recorded today
               </div>
             )}
+          </SectionCard>
+        </div>
+
+        <div className="fade-in fade-in-5">
+          <SectionCard title="Breast Feeding" icon={<Icons.Heart />} color={colors.feeding}>
+            <div style={{ display: "grid", gap: 12 }}>
+              <div style={{ color: "var(--text-dim)", fontSize: 11, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                Last breast used
+              </div>
+              <div style={{ color: colors.feeding, fontSize: 28, fontWeight: 700 }}>
+                {lastBreast ? lastBreast.breast : "—"}
+              </div>
+              <div style={{ color: "var(--text-muted)", fontSize: 12 }}>
+                {lastBreast ? `${lastBreast.method} · ${formatTime(lastBreast.time)}` : "No breast feedings found"}
+              </div>
+            </div>
           </SectionCard>
         </div>
 

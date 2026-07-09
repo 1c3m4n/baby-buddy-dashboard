@@ -70,6 +70,17 @@ export function summarizeFeedingMethods(feedings) {
   );
 }
 
+export function getHoursSinceLastFeeding(feedings, now = new Date()) {
+  const latestStart = Math.max(
+    ...(feedings || [])
+      .map((feeding) => new Date(feeding?.start || 0).getTime())
+      .filter((timestamp) => Number.isFinite(timestamp) && timestamp <= now.getTime())
+  );
+
+  if (!Number.isFinite(latestStart)) return null;
+  return (now.getTime() - latestStart) / (60 * 60 * 1000);
+}
+
 export function summarizeMilkByType(feedings, now = new Date()) {
   const since = now.getTime() - 24 * 60 * 60 * 1000;
   return (feedings || []).reduce(
