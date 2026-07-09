@@ -23,6 +23,7 @@ export function useBabyData() {
   const [children, setChildren] = useState([]);
   const [child, setChild] = useState(null);
   const [feedings, setFeedings] = useState([]);
+  const [recentFeedings, setRecentFeedings] = useState([]);
   const [weeklyFeedings, setWeeklyFeedings] = useState([]);
   const [pumpings, setPumpings] = useState([]);
   const [weeklyPumpings, setWeeklyPumpings] = useState([]);
@@ -69,6 +70,7 @@ export function useBabyData() {
 
       const [
         feedingsRes,
+        recentFeedingsRes,
         weeklyFeedingsRes,
         pumpingRes,
         weeklyPumpingRes,
@@ -87,6 +89,7 @@ export function useBabyData() {
         monthlySleepRes,
       ] = await Promise.all([
         api.getFeedings({ child: c, start_min: todayMin, start_max: todayMax, limit: 100, ordering: "-start" }),
+        api.getFeedings({ child: c, limit: 100, ordering: "-start" }),
         api.getFeedings({ child: c, start_min: weekMin, limit: 200, ordering: "-start" }),
         api.getPumping({ child: c, start_min: todayMin, start_max: todayMax, limit: 100, ordering: "-start" }),
         api.getPumping({ child: c, start_min: weekMin, limit: 200, ordering: "-start" }),
@@ -106,6 +109,7 @@ export function useBabyData() {
       ]);
 
       setFeedings(feedingsRes.results || []);
+      setRecentFeedings(recentFeedingsRes.results || []);
       setWeeklyFeedings(weeklyFeedingsRes.results || []);
       setPumpings(pumpingRes.results || []);
       setWeeklyPumpings(weeklyPumpingRes.results || []);
@@ -168,6 +172,7 @@ export function useBabyData() {
     setChild(mock.children[0]);
     childIdRef.current = mock.children[0].id;
     setFeedings(mock.feedings);
+    setRecentFeedings(mock.weeklyFeedings);
     setWeeklyFeedings(mock.weeklyFeedings);
     setPumpings(mock.pumpings);
     setWeeklyPumpings(mock.weeklyPumpings);
@@ -196,6 +201,7 @@ export function useBabyData() {
       setChild(selected);
       const mock = getMockData(id);
       setFeedings(mock.feedings);
+      setRecentFeedings(mock.weeklyFeedings);
       setWeeklyFeedings(mock.weeklyFeedings);
       setPumpings(mock.pumpings);
       setWeeklyPumpings(mock.weeklyPumpings);
@@ -245,6 +251,7 @@ export function useBabyData() {
     child,
     selectChild: demoRef.current ? selectMockChild : selectChild,
     feedings,
+    recentFeedings,
     weeklyFeedings,
     pumpings,
     weeklyPumpings,

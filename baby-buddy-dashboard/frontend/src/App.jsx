@@ -231,6 +231,7 @@ export default function App() {
         {activeTab === "overview" && (
           <OverviewTab
             feedings={data.feedings}
+            recentFeedings={data.recentFeedings}
             weeklyFeedings={data.weeklyFeedings}
             pumpings={data.pumpings}
             weeklyPumpings={data.weeklyPumpings}

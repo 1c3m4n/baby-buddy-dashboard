@@ -45,14 +45,14 @@ import { useUnits } from "../utils/units";
 
 const COLLAPSED_COUNT = 2;
 
-export default function OverviewTab({ feedings, weeklyFeedings: weeklyFeedingsRaw, pumpings = [], weeklyPumpings = [], medication = [], sleepEntries, weeklySleep, changes, tummyTimes, weeklyTummyTimes, weights, onEditEntry, onLogVitamins }) {
+export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedings: weeklyFeedingsRaw, pumpings = [], weeklyPumpings = [], medication = [], sleepEntries, weeklySleep, changes, tummyTimes, weeklyTummyTimes, weights, onEditEntry, onLogVitamins }) {
   const units = useUnits();
   const [expanded, setExpanded] = useState({});
   const [dayModal, setDayModal] = useState(null);
   const [selectedBar, setSelectedBar] = useState(null);
   const toggle = (key) => setExpanded((prev) => ({ ...prev, [key]: !prev[key] }));
 
-  const feedingTimeline = toFeedingTimeline(feedings, units.volume);
+  const feedingTimeline = toFeedingTimeline(recentFeedings, units.volume);
   const pumpingTimeline = toPumpingTimeline(pumpings, units.volume);
   const diaperTimeline = toDiaperTimeline(changes);
   const sleepBlocks = toSleepBlocks(sleepEntries);
@@ -67,7 +67,7 @@ export default function OverviewTab({ feedings, weeklyFeedings: weeklyFeedingsRa
   const vitaminMedication = summarizeVitaminMedication(medication);
   const defaultVitaminName = getDefaultVitaminMedicationName(milkTotals);
   const feedingMethods = summarizeFeedingMethods(feedings);
-  const hoursSinceLastFeeding = getHoursSinceLastFeeding(feedings);
+  const hoursSinceLastFeeding = getHoursSinceLastFeeding(recentFeedings);
 
   const totalSleep = sleepEntries.reduce(
     (s, e) => s + parseDuration(e.duration),

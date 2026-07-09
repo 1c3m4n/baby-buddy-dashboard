@@ -6,6 +6,14 @@ const overviewSource = await readFile(
   new URL("../src/tabs/OverviewTab.jsx", import.meta.url),
   "utf8"
 );
+const hookSource = await readFile(
+  new URL("../src/hooks/useBabyData.js", import.meta.url),
+  "utf8"
+);
+const appSource = await readFile(
+  new URL("../src/App.jsx", import.meta.url),
+  "utf8"
+);
 
 assert.equal(
   typeof feedingInsights.getHoursSinceLastFeeding,
@@ -43,5 +51,22 @@ assert.ok(
   recentPumpingsIndex >= 0 && breastFeedingIndex > recentPumpingsIndex,
   "Breast Feeding should appear after Recent Pumpings"
 );
+
+assert.match(
+  hookSource,
+  /const\s+\[recentFeedings,\s*setRecentFeedings\]\s*=\s*useState\(\[\]\)/,
+  "useBabyData should keep recent feedings separate from today's feeding totals"
+);
+assert.match(
+  hookSource,
+  /api\.getFeedings\(\{\s*child:\s*c,\s*limit:\s*100,\s*ordering:\s*["']-start["']\s*\}\)/,
+  "useBabyData should request recent feedings without a date range"
+);
+assert.match(hookSource, /setRecentFeedings\(recentFeedingsRes\.results\s*\|\|\s*\[\]\)/);
+assert.match(hookSource, /recentFeedings,/);
+assert.match(appSource, /recentFeedings=\{data\.recentFeedings\}/);
+assert.match(overviewSource, /recentFeedings\s*=\s*\[\]/);
+assert.match(overviewSource, /toFeedingTimeline\(recentFeedings,\s*units\.volume\)/);
+assert.match(overviewSource, /getHoursSinceLastFeeding\(recentFeedings\)/);
 
 console.log("overview feeding priority checks passed");
