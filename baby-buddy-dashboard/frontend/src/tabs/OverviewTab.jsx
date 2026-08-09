@@ -186,13 +186,13 @@ export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedi
                     <div style={{ color: "var(--text-muted)", fontSize: 11 }}>{units.volume}</div>
                   </div>
                   <div>
-                    <div style={{ color: "var(--text-dim)", fontSize: 11 }}>7 feeds</div>
-                    <div style={{ color: colors.growth, fontSize: 20, fontWeight: 700 }}>{feedingAmounts.sevenFeeds}</div>
+                    <div style={{ color: "var(--text-dim)", fontSize: 11 }}>5 feeds</div>
+                    <div style={{ color: colors.growth, fontSize: 20, fontWeight: 700 }}>{feedingAmounts.fiveFeeds}</div>
                     <div style={{ color: "var(--text-muted)", fontSize: 11 }}>{units.volume}/feed</div>
                   </div>
                   <div>
-                    <div style={{ color: "var(--text-dim)", fontSize: 11 }}>8 feeds</div>
-                    <div style={{ color: colors.growth, fontSize: 20, fontWeight: 700 }}>{feedingAmounts.eightFeeds}</div>
+                    <div style={{ color: "var(--text-dim)", fontSize: 11 }}>6 feeds</div>
+                    <div style={{ color: colors.growth, fontSize: 20, fontWeight: 700 }}>{feedingAmounts.sixFeeds}</div>
                     <div style={{ color: "var(--text-muted)", fontSize: 11 }}>{units.volume}/feed</div>
                   </div>
                 </div>

@@ -12,15 +12,15 @@ const fixedNow = new Date("2026-05-30T12:00:00Z");
 assert.deepEqual(calculateFeedingAmounts([{ weight: "3.5", date: "2026-05-30" }]), {
   weight: 3.5,
   dailyAmount: 530,
-  sevenFeeds: 80,
-  eightFeeds: 70,
+  fiveFeeds: 110,
+  sixFeeds: 90,
 });
 
 assert.deepEqual(calculateFeedingAmounts([{ weight: "4", date: "2026-05-30" }]), {
   weight: 4,
   dailyAmount: 600,
-  sevenFeeds: 90,
-  eightFeeds: 80,
+  fiveFeeds: 120,
+  sixFeeds: 100,
 });
 
 assert.equal(calculateFeedingAmounts([]), null);

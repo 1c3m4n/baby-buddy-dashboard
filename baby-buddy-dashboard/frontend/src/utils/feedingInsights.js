@@ -31,8 +31,8 @@ export function calculateFeedingAmounts(weights) {
   return {
     weight: Math.round(latest.weightValue * 100) / 100,
     dailyAmount: roundUpToNearestTen(dailyAmount),
-    sevenFeeds: roundUpToNearestTen(dailyAmount / 7),
-    eightFeeds: roundUpToNearestTen(dailyAmount / 8),
+    fiveFeeds: roundUpToNearestTen(dailyAmount / 5),
+    sixFeeds: roundUpToNearestTen(dailyAmount / 6),
   };
 }
 

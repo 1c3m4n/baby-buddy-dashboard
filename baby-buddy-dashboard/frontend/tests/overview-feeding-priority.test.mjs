@@ -59,10 +59,19 @@ assert.match(
 );
 assert.match(
   hookSource,
-  /api\.getFeedings\(\{\s*child:\s*c,\s*limit:\s*100,\s*ordering:\s*["']-start["']\s*\}\)/,
-  "useBabyData should request recent feedings without a date range"
+  /api\.getFeedings\(\{\s*child:\s*c,\s*limit:\s*5,\s*ordering:\s*["']-start["']\s*\}\)/,
+  "useBabyData should request only the five latest feedings without a date range"
 );
-assert.match(hookSource, /setRecentFeedings\(recentFeedingsRes\.results\s*\|\|\s*\[\]\)/);
+assert.match(overviewSource, /feedingAmounts\.fiveFeeds/);
+assert.match(overviewSource, /feedingAmounts\.sixFeeds/);
+assert.match(overviewSource, />5 feeds</);
+assert.match(overviewSource, />6 feeds</);
+assert.match(hookSource, /setRecentFeedings\(\(recentFeedingsRes\.results\s*\|\|\s*\[\]\)\.slice\(0,\s*5\)\)/);
+assert.equal(
+  (hookSource.match(/setRecentFeedings\(mock\.weeklyFeedings\.slice\(0,\s*5\)\)/g) || []).length,
+  2,
+  "demo mode should also limit recent feedings to five entries"
+);
 assert.match(hookSource, /recentFeedings,/);
 assert.match(appSource, /recentFeedings=\{data\.recentFeedings\}/);
 assert.match(overviewSource, /recentFeedings\s*=\s*\[\]/);

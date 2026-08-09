@@ -89,7 +89,7 @@ export function useBabyData() {
         monthlySleepRes,
       ] = await Promise.all([
         api.getFeedings({ child: c, start_min: todayMin, start_max: todayMax, limit: 100, ordering: "-start" }),
-        api.getFeedings({ child: c, limit: 100, ordering: "-start" }),
+        api.getFeedings({ child: c, limit: 5, ordering: "-start" }),
         api.getFeedings({ child: c, start_min: weekMin, limit: 200, ordering: "-start" }),
         api.getPumping({ child: c, start_min: todayMin, start_max: todayMax, limit: 100, ordering: "-start" }),
         api.getPumping({ child: c, start_min: weekMin, limit: 200, ordering: "-start" }),
@@ -109,7 +109,7 @@ export function useBabyData() {
       ]);
 
       setFeedings(feedingsRes.results || []);
-      setRecentFeedings(recentFeedingsRes.results || []);
+      setRecentFeedings((recentFeedingsRes.results || []).slice(0, 5));
       setWeeklyFeedings(weeklyFeedingsRes.results || []);
       setPumpings(pumpingRes.results || []);
       setWeeklyPumpings(weeklyPumpingRes.results || []);
@@ -172,7 +172,7 @@ export function useBabyData() {
     setChild(mock.children[0]);
     childIdRef.current = mock.children[0].id;
     setFeedings(mock.feedings);
-    setRecentFeedings(mock.weeklyFeedings);
+    setRecentFeedings(mock.weeklyFeedings.slice(0, 5));
     setWeeklyFeedings(mock.weeklyFeedings);
     setPumpings(mock.pumpings);
     setWeeklyPumpings(mock.weeklyPumpings);
@@ -201,7 +201,7 @@ export function useBabyData() {
       setChild(selected);
       const mock = getMockData(id);
       setFeedings(mock.feedings);
-      setRecentFeedings(mock.weeklyFeedings);
+      setRecentFeedings(mock.weeklyFeedings.slice(0, 5));
       setWeeklyFeedings(mock.weeklyFeedings);
       setPumpings(mock.pumpings);
       setWeeklyPumpings(mock.weeklyPumpings);
