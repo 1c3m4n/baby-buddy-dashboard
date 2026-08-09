@@ -23,16 +23,18 @@ export default function MedicationForm({ childId, entry, defaultName, onDone, on
   const [time, setTime] = useState(entry?.time ? toLocalDatetime(new Date(entry.time)) : toLocalDatetime(new Date()));
   const [notes, setNotes] = useState(entry?.notes || "");
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
+    setSaveError(null);
     try {
       const data = {
         name: name.trim(),
         dosage: dosage === "" ? null : Number(dosage),
         dosage_unit: dosageUnit,
-        time: `${time}:00`,
+        time: new Date(time).toISOString(),
         notes: notes.trim() || null,
         tags: ["vitamins"],
       };
@@ -43,7 +45,8 @@ export default function MedicationForm({ childId, entry, defaultName, onDone, on
         await api.createMedication(data);
       }
       onDone();
-    } catch {
+    } catch (err) {
+      setSaveError(err.message || "The dashboard could not save this vitamin entry.");
       setSaving(false);
     }
   };
@@ -94,6 +97,11 @@ export default function MedicationForm({ childId, entry, defaultName, onDone, on
             placeholder="Optional"
           />
         </FormField>
+        {saveError && (
+          <p role="alert" style={{ color: "#b42318", margin: "0 0 12px" }}>
+            Unable to save vitamins: {saveError}
+          </p>
+        )}
         <FormButton color={colors.temp} disabled={saving}>
           {saving ? "Saving..." : isEdit ? "Update Vitamins" : "Save Vitamins"}
         </FormButton>

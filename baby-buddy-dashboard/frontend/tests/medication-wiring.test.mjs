@@ -24,6 +24,9 @@ assert.match(formSource, /api\.updateMedication\(entry\.id,\s*data\)/, "Medicati
 assert.match(formSource, /dosage_unit:\s*dosageUnit/, "MedicationForm payload should include dosage_unit");
 assert.match(formSource, /tags:\s*\[["']vitamins["']\]/, "MedicationForm should tag vitamin medication records");
 assert.match(formSource, /useState\(entry\?\.dosage_unit\s*\|\|\s*["']drops["']\)/, "MedicationForm should default unit to drops");
+assert.match(formSource, /time:\s*new Date\(time\)\.toISOString\(\)/, "MedicationForm should send a timezone-aware ISO timestamp");
+assert.match(formSource, /const \[saveError, setSaveError\] = useState\(null\)/, "MedicationForm should retain a save error for the user");
+assert.match(formSource, /Unable to save vitamins:/, "MedicationForm should display a failed save error");
 
 assert.match(appSource, /import\s+MedicationForm\s+from\s+["']\.\/components\/forms\/MedicationForm["'];/, "App should import MedicationForm");
 assert.match(appSource, /id:\s*["']vitamins["'][\s\S]*label:\s*["']Vitamins["']/, "App should expose a Vitamins quick action");
