@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node tests/pumping-timer.test.mjs && node tests/decimal-input.test.mjs && node tests/feeding-insights.test.mjs && node tests/pumping-timeline.test.mjs && node tests/medication-insights.test.mjs && node tests/medication-wiring.test.mjs && node tests/overview-feeding-priority.test.mjs && node tests/sleep-form-timezone.test.mjs"
+    "test": "node tests/pumping-timer.test.mjs && node tests/decimal-input.test.mjs && node tests/feeding-insights.test.mjs && node tests/pumping-timeline.test.mjs && node tests/medication-insights.test.mjs && node tests/medication-wiring.test.mjs && node tests/overview-feeding-priority.test.mjs && node tests/sleep-form-timezone.test.mjs && node tests/feeding-form-update.test.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
