@@ -16,24 +16,20 @@ export default function HeightForm({ childId, entry, onDone, onClose }) {
   const [height, setHeight] = useState(entry?.height ? String(entry.height) : "");
   const [date, setDate] = useState(entry?.date ? toLocalDate(entry.date) : toLocalDate(new Date()));
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!height) return;
+    setError("");
     setSaving(true);
     try {
-      const data = {
-        height: parseFloat(height),
-        date,
-      };
-      if (isEdit) {
-        await api.updateHeight(entry.id, data);
-      } else {
-        data.child = childId;
-        await api.createHeight(data);
-      }
+      const data = { height: parseFloat(height), date };
+      if (isEdit) await api.updateHeight(entry.id, data);
+      else { data.child = childId; await api.createHeight(data); }
       onDone();
-    } catch {
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to save height. Please try again.");
       setSaving(false);
     }
   };
@@ -41,30 +37,10 @@ export default function HeightForm({ childId, entry, onDone, onClose }) {
   return (
     <Modal title={isEdit ? "Edit Height" : "Log Height"} onClose={onClose}>
       <form onSubmit={handleSubmit}>
-        <FormField label={`Height (${units.length})`}>
-          <FormInput
-            type="number"
-            value={height}
-            onChange={(e) => setHeight(e.target.value)}
-            placeholder="50.0"
-            min="0"
-            max="200"
-            step="0.1"
-            autoFocus
-            required
-          />
-        </FormField>
-        <FormField label="Date">
-          <FormInput
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            required
-          />
-        </FormField>
-        <FormButton color={colors.height} disabled={saving || !height}>
-          {saving ? "Saving..." : isEdit ? "Update Height" : "Save Height"}
-        </FormButton>
+        <FormField label={`Height (${units.length})`}><FormInput type="number" value={height} onChange={(e) => setHeight(e.target.value)} placeholder="50.0" min="0" max="200" step="0.1" autoFocus required /></FormField>
+        <FormField label="Date"><FormInput type="date" value={date} onChange={(e) => setDate(e.target.value)} required /></FormField>
+        {error && <p role="alert" style={{ color: "var(--danger, #d14343)", fontSize: 13, margin: "0 0 12px" }}>{error}</p>}
+        <FormButton color={colors.height} disabled={saving || !height}>{saving ? "Saving..." : isEdit ? "Update Height" : "Save Height"}</FormButton>
       </form>
     </Modal>
   );

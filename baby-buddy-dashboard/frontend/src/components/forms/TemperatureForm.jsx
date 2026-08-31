@@ -8,10 +8,12 @@ export default function TemperatureForm({ childId, onDone, onClose }) {
   const units = useUnits();
   const [temp, setTemp] = useState("");
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!temp) return;
+    setError("");
     setSaving(true);
     try {
       await api.createTemperature({
@@ -19,7 +21,8 @@ export default function TemperatureForm({ childId, onDone, onClose }) {
         temperature: parseFloat(temp),
       });
       onDone();
-    } catch {
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to save temperature. Please try again.");
       setSaving(false);
     }
   };
@@ -39,6 +42,7 @@ export default function TemperatureForm({ childId, onDone, onClose }) {
             autoFocus
           />
         </FormField>
+        {error && <p role="alert" style={{ color: "var(--danger, #d14343)", fontSize: 13, margin: "0 0 12px" }}>{error}</p>}
         <FormButton color={colors.temp} disabled={saving || !temp}>
           {saving ? "Saving..." : "Save Temperature"}
         </FormButton>
