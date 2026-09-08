@@ -94,7 +94,7 @@ export function useBabyData() {
         api.getPumping({ child: c, start_min: todayMin, start_max: todayMax, limit: 100, ordering: "-start" }),
         api.getPumping({ child: c, start_min: weekMin, limit: 200, ordering: "-start" }),
         api.getMedication({ child: c, date_min: todayMin, date_max: todayMax, limit: 100, ordering: "-time" }),
-        api.getSleep({ child: c, start_min: sleepMin, limit: 100, ordering: "-start" }),
+        api.getSleep({ child: c, end_min: sleepMin, limit: 100, ordering: "-end" }),
         api.getSleep({ child: c, start_min: weekMin, limit: 200, ordering: "-start" }),
         api.getChanges({ child: c, date_min: todayMin, date_max: todayMax, limit: 100, ordering: "-time" }),
         api.getTummyTimes({ child: c, start_min: todayMin, start_max: todayMax, limit: 100, ordering: "-start" }),

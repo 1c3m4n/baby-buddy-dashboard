@@ -353,6 +353,7 @@ export default function App() {
           childId={data.child?.id}
           timerId={modal.timerId}
           entry={modal.entry}
+          defaultFeeding={modal.timerId ? data.recentFeedings?.[0] : null}
           onDone={handleFormDone}
           onClose={closeModal}
         />

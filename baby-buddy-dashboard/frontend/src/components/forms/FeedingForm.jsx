@@ -33,14 +33,20 @@ function toApiDatetime(value) {
   return date.toISOString();
 }
 
-export default function FeedingForm({ childId, timerId, entry, onDone, onClose }) {
+export default function FeedingForm({ childId, timerId, entry, defaultFeeding, onDone, onClose }) {
   const units = useUnits();
   const isEdit = !!entry;
   const now = new Date();
   const fifteenMinsAgo = new Date(now.getTime() - 15 * 60 * 1000);
-  const [type, setType] = useState(entry?.type || "breast milk");
-  const [method, setMethod] = useState(entry?.method || "bottle");
-  const [amount, setAmount] = useState(entry?.amount != null ? String(entry.amount) : "");
+  const [type, setType] = useState(entry?.type || defaultFeeding?.type || "breast milk");
+  const [method, setMethod] = useState(entry?.method || defaultFeeding?.method || "bottle");
+  const [amount, setAmount] = useState(
+    entry?.amount != null
+      ? String(entry.amount)
+      : defaultFeeding?.amount != null
+        ? String(defaultFeeding.amount)
+        : ""
+  );
   const [start, setStart] = useState(entry?.start ? toLocalDatetime(new Date(entry.start)) : toLocalDatetime(fifteenMinsAgo));
   const [end, setEnd] = useState(entry?.end ? toLocalDatetime(new Date(entry.end)) : toLocalDatetime(now));
   const [notes, setNotes] = useState(entry?.notes || "");
