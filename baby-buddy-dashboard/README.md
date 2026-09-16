@@ -49,6 +49,20 @@ Then install the "Baby Buddy Dashboard" add-on and configure:
 
 The add-on supports Home Assistant ingress and also exposes port `8099` for direct access when configured in Home Assistant's Network settings.
 
+### Home Assistant daily summary sensors
+
+When installed as a Home Assistant add-on, the dashboard publishes two summary
+entities for automations, widgets, and Live Activities:
+
+- `sensor.baby_buddy_feeding_today` — today's completed milk amount, completed
+  feeding count, current feeding number, and active-timer status.
+- `sensor.baby_buddy_sleep_today` — today's sleep minutes (including an active
+  sleep timer), sleep count, nap count, and active-timer status.
+
+The same data is available from `GET /api/summary/today`. Calendar-day totals
+use Home Assistant's configured timezone; sleep crossing midnight is clipped to
+the part that falls within the current day.
+
 ## Local development
 
 Frontend:

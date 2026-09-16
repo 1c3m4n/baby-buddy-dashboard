@@ -1,5 +1,5 @@
 name: "Baby Buddy Dashboard"
-version: "1.2.25"
+version: "1.2.26"
 slug: "baby-buddy-dashboard"
 description: "Modern dashboard for Baby Buddy with charts, timers, and quick-log actions.
               Supports running as a standalone web app or as a Home Assistant add-on.
@@ -24,6 +24,7 @@ ports_description:
 panel_icon: "mdi:baby-face-outline"
 panel_title: "Baby Dashboard"
 panel_admin: false
+homeassistant_api: true
 options:
   baby_buddy_url: ""
   baby_buddy_api_key: ""
