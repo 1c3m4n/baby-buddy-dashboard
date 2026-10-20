@@ -175,3 +175,7 @@ There is no tracked GitHub Actions workflow in this checkout. The add-on has no 
 
 - Feeding summary reads “x feeds” (singular “1 feed”), with mL and “since last” underneath. Sleep keeps its rolling total but omits the “Last 24h” caption.
 - Milk & Vitamins and every other overview detail card share `.overview-grid`, including Daily Pumping Amounts. Cards sit side by side when two 320px columns plus the gap fit; narrow screens stack them. Previously Milk & Vitamins occupied a separate grid and forced a full-width row.
+
+## Milk & Vitamins refinement in 1.2.30
+
+The Vitamin guidance section (recommendation label and explanatory text) was removed at Joshua's request. Keep the milk totals, vitamin logging status, editable latest record and log button. The existing default vitamin name calculation for the logging form remains unchanged.

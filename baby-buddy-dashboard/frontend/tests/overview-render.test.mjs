@@ -12,6 +12,9 @@ try {
   const render = props => renderToStaticMarkup(React.createElement(Overview, {...base,...props}));
   const empty = render({});
   for (const title of ['Feeding Amount Guide','Breast Feeding','Recent Pumpings','Diaper Changes','Daily Pumping Amounts','Tummy Time']) assert.ok(!empty.includes(title), `empty card hidden: ${title}`);
+  assert.ok(!empty.includes('Vitamin guidance'));
+  assert.ok(!empty.includes('Vitamin K + D required'));
+  for (const label of ['Milk &amp; Vitamins', 'Breast milk', 'Formula', 'Vitamin log', 'Not logged today', 'Log Vitamin K + D']) assert.ok(empty.includes(label), `milk totals and vitamin logging retained: ${label}`);
   const historical = render({feedings:[{start:at(48),method:'left breast'}],pumpings:[{start:at(48),amount:50}],weeklyPumpings:[{start:at(48),amount:50}],changes:[{time:at(48)}],tummyTimes:[{start:at(48),duration:'00:10:00'}],weeklyTummyTimes:[{start:at(48),duration:'00:10:00'}]});
   for (const title of ['Breast Feeding','Recent Pumpings','Diaper Changes','Daily Pumping Amounts','Tummy Time']) assert.ok(!historical.includes(title), `yesterday cannot reveal today's card: ${title}`);
   const today = new Date(now); today.setHours(0,0,0,0);

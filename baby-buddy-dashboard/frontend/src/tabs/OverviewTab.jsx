@@ -30,7 +30,6 @@ import {
 } from "../utils/formatters";
 import {
   getLastBreastUsed,
-  getVitaminRecommendation,
   summarizeFeedingMethods,
   summarizeMilkByType,
 } from "../utils/feedingInsights";
@@ -67,7 +66,6 @@ export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedi
   const tummyByDay = aggregateTummyByDay(weeklyTummyTimes);
   const lastBreast = todayBreast;
   const milkTotals = summarizeMilkByType(weeklyFeedingsRaw);
-  const vitaminRecommendation = getVitaminRecommendation(milkTotals);
   const vitaminMedication = summarizeVitaminMedication(medication);
   const defaultVitaminName = getDefaultVitaminMedicationName(milkTotals);
   const feedingMethods = summarizeFeedingMethods(todayFeedings);
@@ -186,15 +184,6 @@ export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedi
                   <div style={{ color: colors.tummy, fontSize: 22, fontWeight: 700 }}>
                     {Math.round(milkTotals.formula)} {units.volume}
                   </div>
-                </div>
-              </div>
-              <div style={{ borderTop: "1px solid var(--border)", paddingTop: 12 }}>
-                <div style={{ color: "var(--text-muted)", fontSize: 12 }}>Vitamin guidance</div>
-                <div style={{ color: colors.temp, fontSize: 18, fontWeight: 700 }}>
-                  {vitaminRecommendation.label}
-                </div>
-                <div style={{ color: "var(--text-dim)", fontSize: 12, marginTop: 4 }}>
-                  {vitaminRecommendation.detail}
                 </div>
               </div>
               <div style={{ borderTop: "1px solid var(--border)", paddingTop: 12 }}>
