@@ -2,6 +2,7 @@ export default function StatCard({ icon, label, value, sub, color, accent }) {
   return (
     <div
       style={{
+        height: "100%",
         background: "var(--card-bg)",
         borderRadius: 16,
         padding: "20px 22px",

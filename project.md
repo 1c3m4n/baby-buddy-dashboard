@@ -179,3 +179,7 @@ There is no tracked GitHub Actions workflow in this checkout. The add-on has no 
 ## Milk & Vitamins refinement in 1.2.30
 
 The Vitamin guidance section (recommendation label and explanatory text) was removed at Joshua's request. Keep the milk totals, vitamin logging status, editable latest record and log button. The existing default vitamin name calculation for the logging form remains unchanged.
+
+## Equal card heights in 1.2.31
+
+Overview grid items stretch to the tallest card in their row. Shared SectionCard and StatCard roots fill their wrapper height so visible card borders align, including the summary row. Heights stay automatic on single-column mobile layouts and expand with content.

@@ -480,7 +480,7 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
   gap: 16px;
-  align-items: start;
+  align-items: stretch;
 }
 
 .overview-grid > * {

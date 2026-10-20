@@ -2,6 +2,7 @@ export default function SectionCard({ title, icon, children, color }) {
   return (
     <div
       style={{
+        height: "100%",
         background: "var(--card-bg)",
         borderRadius: 16,
         border: "1px solid var(--border)",
