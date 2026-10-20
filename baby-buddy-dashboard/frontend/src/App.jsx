@@ -236,6 +236,8 @@ export default function App() {
             pumpings={data.pumpings}
             weeklyPumpings={data.weeklyPumpings}
             medication={data.medication}
+            recentSleep={data.recentSleep}
+            recentChanges={data.recentChanges}
             sleepEntries={data.sleepEntries}
             weeklySleep={data.weeklySleep}
             changes={data.changes}

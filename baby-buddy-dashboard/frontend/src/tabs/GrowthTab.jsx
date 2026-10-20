@@ -19,6 +19,8 @@ import { colors } from "../utils/colors";
 import { useUnits } from "../utils/units";
 import { toGrowthSeries, formatGrowthTick, dailyFeedingTotals, dailySleepTotals, getEntriesForDate } from "../utils/formatters";
 
+import { formatHoursMinutes } from "../utils/overviewInsights";
+
 export default function GrowthTab({ weights, heights, monthlyFeedings, monthlySleep, onEditEntry }) {
   const units = useUnits();
   const [dayModal, setDayModal] = useState(null);
@@ -38,7 +40,7 @@ export default function GrowthTab({ weights, heights, monthlyFeedings, monthlySl
     : 0;
   const sleepDays = sleepSeries.filter((d) => d.hours > 0);
   const avgSleep = sleepDays.length
-    ? (sleepDays.reduce((s, d) => s + d.hours, 0) / sleepDays.length).toFixed(1)
+    ? (sleepDays.reduce((s, d) => s + d.hours, 0) / sleepDays.length)
     : 0;
 
   const handleChartClick = (data, type) => {
@@ -216,7 +218,7 @@ export default function GrowthTab({ weights, heights, monthlyFeedings, monthlySl
               </span>
             </div>
             <div style={{ fontSize: 28, fontWeight: 700, color: "var(--text)", letterSpacing: "-0.02em" }}>
-              {avgSleep ? `${avgSleep} h` : "—"}
+              {avgSleep ? formatHoursMinutes(avgSleep) : "—"}
             </div>
             <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4 }}>
               per day (30d)
@@ -305,8 +307,8 @@ export default function GrowthTab({ weights, heights, monthlyFeedings, monthlySl
                 {selectedBar?.type === "sleep" && (
                   <ChartDetailBar
                     label={selectedBar.label}
-                    value={selectedBar.value}
-                    unit="h"
+                    value={formatHoursMinutes(selectedBar.value)}
+                    unit=""
                     color={colors.sleep}
                     onViewEntries={() => openDayModal(selectedBar.label, "sleep")}
                     onDismiss={() => setSelectedBar(null)}

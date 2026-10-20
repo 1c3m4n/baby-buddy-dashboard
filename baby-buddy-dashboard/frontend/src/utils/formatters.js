@@ -97,9 +97,9 @@ export function toDiaperTimeline(changes) {
 
 export function toSleepBlocks(sleepEntries) {
   return sleepEntries.map((s) => ({
-    start: formatTime(s.start),
-    end: s.end ? formatTime(s.end) : "ongoing",
-    duration: parseDuration(s.duration),
+    start: formatTime(s.displayStart ?? s.start),
+    end: s.displayEnd != null ? formatTime(s.displayEnd) : s.end ? formatTime(s.end) : "ongoing",
+    duration: s.displayHours ?? parseDuration(s.duration),
     nap: s.nap,
     entry: s,
   }));

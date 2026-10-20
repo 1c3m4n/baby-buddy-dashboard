@@ -1,5 +1,7 @@
 import { useUnits } from "../utils/units";
 
+import { formatHoursMinutes } from "../utils/overviewInsights";
+
 export default function CustomTooltip({ active, payload, label, labelFormatter }) {
   const units = useUnits();
   if (!active || !payload?.length) return null;
@@ -37,7 +39,7 @@ export default function CustomTooltip({ active, payload, label, labelFormatter }
               display: "inline-block",
             }}
           />
-          {p.name}: {p.value}
+          {p.name}: {p.name === "hours" ? formatHoursMinutes(p.value) : p.value}
           {p.name === "amount" ? ` ${units.volume}` : p.name === "minutes" ? " min" : p.name === "weight" ? ` ${units.weight}` : p.name === "height" ? ` ${units.length}` : ""}
         </div>
       ))}

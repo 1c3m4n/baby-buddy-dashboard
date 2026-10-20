@@ -28,6 +28,8 @@ export function useBabyData() {
   const [pumpings, setPumpings] = useState([]);
   const [weeklyPumpings, setWeeklyPumpings] = useState([]);
   const [medication, setMedication] = useState([]);
+  const [recentSleep, setRecentSleep] = useState([]);
+  const [recentChanges, setRecentChanges] = useState([]);
   const [sleepEntries, setSleepEntries] = useState([]);
   const [weeklySleep, setWeeklySleep] = useState([]);
   const [changes, setChanges] = useState([]);
@@ -75,6 +77,8 @@ export function useBabyData() {
         pumpingRes,
         weeklyPumpingRes,
         medicationRes,
+        recentSleepRes,
+        recentChangesRes,
         sleepRes,
         weeklySleepRes,
         changesRes,
@@ -94,8 +98,10 @@ export function useBabyData() {
         api.getPumping({ child: c, start_min: todayMin, start_max: todayMax, limit: 100, ordering: "-start" }),
         api.getPumping({ child: c, start_min: weekMin, limit: 200, ordering: "-start" }),
         api.getMedication({ child: c, date_min: todayMin, date_max: todayMax, limit: 100, ordering: "-time" }),
+        api.getSleep({ child: c, limit: 1, ordering: "-end" }),
+        api.getChanges({ child: c, limit: 1, ordering: "-time" }),
         api.getSleep({ child: c, end_min: sleepMin, limit: 100, ordering: "-end" }),
-        api.getSleep({ child: c, start_min: weekMin, limit: 200, ordering: "-start" }),
+        api.getSleep({ child: c, end_min: weekMin, limit: 200, ordering: "-start" }),
         api.getChanges({ child: c, date_min: todayMin, date_max: todayMax, limit: 100, ordering: "-time" }),
         api.getTummyTimes({ child: c, start_min: todayMin, start_max: todayMax, limit: 100, ordering: "-start" }),
         api.getTummyTimes({ child: c, start_min: weekMin, limit: 200, ordering: "-start" }),
@@ -114,6 +120,8 @@ export function useBabyData() {
       setPumpings(pumpingRes.results || []);
       setWeeklyPumpings(weeklyPumpingRes.results || []);
       setMedication(medicationRes.results || []);
+      setRecentSleep(recentSleepRes.results || []);
+      setRecentChanges(recentChangesRes.results || []);
       setSleepEntries(sleepRes.results || []);
       setWeeklySleep(weeklySleepRes.results || []);
       setChanges(changesRes.results || []);
@@ -177,6 +185,8 @@ export function useBabyData() {
     setPumpings(mock.pumpings);
     setWeeklyPumpings(mock.weeklyPumpings);
     setMedication(mock.medication);
+    setRecentSleep(mock.recentSleep);
+    setRecentChanges(mock.recentChanges);
     setSleepEntries(mock.sleepEntries);
     setWeeklySleep(mock.weeklySleep);
     setChanges(mock.changes);
@@ -206,6 +216,8 @@ export function useBabyData() {
       setPumpings(mock.pumpings);
       setWeeklyPumpings(mock.weeklyPumpings);
       setMedication(mock.medication);
+      setRecentSleep(mock.recentSleep);
+      setRecentChanges(mock.recentChanges);
       setSleepEntries(mock.sleepEntries);
       setWeeklySleep(mock.weeklySleep);
       setChanges(mock.changes);
@@ -256,6 +268,8 @@ export function useBabyData() {
     pumpings,
     weeklyPumpings,
     medication,
+    recentSleep,
+    recentChanges,
     sleepEntries,
     weeklySleep,
     changes,

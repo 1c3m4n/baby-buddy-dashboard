@@ -118,7 +118,7 @@ Preserve these existing semantics unless the requested scope changes them:
 - The rolling sleep collection is filtered by completion time (`end_min`, ordering `-end`); daily HA summary totals have separate calendar-day clipping rules.
 - Timer completion defaults use the edited entry first, then the latest feeding's coupled type/method/amount, then static defaults. Keep timer references when saving timer-backed entries.
 - Manual `datetime-local` form values must become timezone-aware ISO strings using `new Date(value).toISOString()` on create and update. Reject invalid intervals and show API errors inside the form. Retain user input on failure.
-- The existing feeding estimate uses latest weight × 150 mL/kg/day, rounds guide amounts up to 10 mL, and shows 5/6 feeds per day. The add-on README still says 7/8; code and tests are authoritative until that older prose is corrected.
+- The feeding amount guide was removed from the overview in 1.2.28 at Joshua's request. The pure calculation helper remains for existing tests; do not reintroduce the card.
 - Milk totals separate breast milk and formula over 24 hours. Vitamin reminders use the existing 500 mL formula threshold; logging uses Baby Buddy medication records tagged `vitamins`, with blank dosage defaults. These are existing household rules, not a request for new health advice.
 - `unit_system` currently changes labels only; it does not convert stored values.
 
@@ -162,3 +162,11 @@ There is no tracked GitHub Actions workflow in this checkout. The add-on has no 
 - Hermes project memory: `/home/joshua/.hermes/memories/MEMORY.md` (historical context; verify mutable details).
 - Local HA skill: `/home/joshua/.codex/skills/home-assistant/SKILL.md` and its `references/local-setup.md`.
 - Current source code and tests take precedence over stale paths, older example payloads, and older README text. In particular, do not reuse the medication reference's old bare-local timestamp example.
+
+## Overview changes in 1.2.28
+
+- Feeding summary shows today's total feedings and mL, plus hours/minutes since the latest feeding started. Sleep durations use hours/minutes; the sleep summary also shows time since the latest sleep ended. Diapers retain today's count and show whole elapsed days since the latest record.
+- `recentSleep` and `recentChanges` are independent, child-scoped queries without day filters, so recency remains available across quiet days. Live fetches and both demo child paths include them.
+- Breast Feeding, Recent Pumpings, Diaper Changes, Tummy Time (including its summary) and Daily Pumping Amounts are hidden without matching records today; historical data alone does not reveal them.
+- Sleep Pattern uses a stacked segment per sleep session. `overviewInsights.js` clips each session at local calendar boundaries, including DST, and the weekly query uses `end_min` to include sleeps entering the first displayed day. Day details show clipped portions while edits retain original timestamps.
+- Overview regression tests cover elapsed formatting, day splitting, midnight/week boundaries, DST and rendered today/empty/historical card visibility.

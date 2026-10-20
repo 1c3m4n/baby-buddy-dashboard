@@ -11,7 +11,6 @@ This fork adds opinionated dashboard behaviour, including:
 - personalised overview cards for feeding, pumping, sleep, diapers, weight, and activity
 - quick-log flows for common baby-care actions
 - milk intake summaries for the last 24 hours
-- feeding guide amounts derived from recent weight data
 - vitamin guidance based on formula intake thresholds
 - Home Assistant add-on metadata, ingress support, and direct web-port access
 
@@ -23,9 +22,7 @@ Always follow the guidance from your own midwife, consultatiebureau, GP, paediat
 
 The dashboard includes feeding helper cards that estimate useful amounts from tracked Baby Buddy data:
 
-- recommended daily milk amount is based on the latest recorded weight
-- per-feed guidance is shown for 7 or 8 feeds per day
-- guide amounts are rounded up to the nearest 10 mL for easier real-world bottle preparation
+- today's feeding count and milk amount, with hours and minutes since the latest feeding
 - 24-hour breast milk and formula totals are shown separately
 - vitamin guidance changes depending on whether formula intake is above or at/below 500 mL in the last 24 hours
 

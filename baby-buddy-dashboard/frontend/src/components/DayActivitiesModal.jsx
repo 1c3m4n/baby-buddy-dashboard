@@ -12,6 +12,8 @@ import {
 } from "../utils/formatters";
 import { useUnits } from "../utils/units";
 
+import { formatHoursMinutes } from "../utils/overviewInsights";
+
 export default function DayActivitiesModal({ day, type, data, onEditEntry, onClose }) {
   const units = useUnits();
 
@@ -121,7 +123,7 @@ export default function DayActivitiesModal({ day, type, data, onEditEntry, onClo
             >
               <TimelineItem
                 time={`${s.start}–${s.end}`}
-                label={`${s.duration.toFixed(1)}h${s.nap ? " · Nap" : ""}`}
+                label={`${formatHoursMinutes(s.duration)}${s.nap ? " · Nap" : ""}`}
                 detail={`${s.start} to ${s.end}`}
                 color={colors.sleep}
                 isLast={i === arr.length - 1}

@@ -430,8 +430,11 @@ function dataForChild(childId) {
 
 export function getMockData(childId) {
   const id = childId || children[0].id;
+  const data = dataForChild(id);
   return {
     children,
-    ...dataForChild(id),
+    ...data,
+    recentSleep: [...data.weeklySleep].filter(entry => entry.end).sort((a, b) => new Date(b.end) - new Date(a.end)).slice(0, 1),
+    recentChanges: [...data.changes].sort((a, b) => new Date(b.time) - new Date(a.time)).slice(0, 1),
   };
 }

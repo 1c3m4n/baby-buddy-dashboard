@@ -23,17 +23,14 @@ import {
   toDiaperTimeline,
   toSleepBlocks,
   aggregateByDayOfWeek,
-  aggregateSleepByDay,
   aggregateTummyByDay,
   getEntriesForDay,
   formatTime,
   parseDuration,
 } from "../utils/formatters";
 import {
-  calculateFeedingAmounts,
   getLastBreastUsed,
   getVitaminRecommendation,
-  getHoursSinceLastFeeding,
   summarizeFeedingMethods,
   summarizeMilkByType,
 } from "../utils/feedingInsights";
@@ -43,9 +40,11 @@ import {
 } from "../utils/medicationInsights";
 import { useUnits } from "../utils/units";
 
+import { formatHoursMinutes, elapsedSince, daysSince, entriesToday, sleepByCalendarDay, sleepEntriesForDay } from "../utils/overviewInsights";
+
 const COLLAPSED_COUNT = 2;
 
-export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedings: weeklyFeedingsRaw, pumpings = [], weeklyPumpings = [], medication = [], sleepEntries, weeklySleep, changes, tummyTimes, weeklyTummyTimes, weights, onEditEntry, onLogVitamins }) {
+export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedings: weeklyFeedingsRaw, pumpings = [], weeklyPumpings = [], medication = [], sleepEntries, recentSleep = [], weeklySleep, changes, recentChanges = [], tummyTimes, weeklyTummyTimes, onEditEntry, onLogVitamins }) {
   const units = useUnits();
   const [expanded, setExpanded] = useState({});
   const [dayModal, setDayModal] = useState(null);
@@ -53,41 +52,48 @@ export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedi
   const toggle = (key) => setExpanded((prev) => ({ ...prev, [key]: !prev[key] }));
 
   const feedingTimeline = toFeedingTimeline(recentFeedings, units.volume);
-  const pumpingTimeline = toPumpingTimeline(pumpings, units.volume);
-  const diaperTimeline = toDiaperTimeline(changes);
+  const todayFeedings = entriesToday(feedings, "start");
+  const todayPumpings = entriesToday(pumpings, "start");
+  const todayChanges = entriesToday(changes, "time");
+  const todayTummy = entriesToday(tummyTimes, "start");
+  const todayBreast = getLastBreastUsed(todayFeedings);
+  const pumpingTimeline = toPumpingTimeline(todayPumpings, units.volume);
+  const diaperTimeline = toDiaperTimeline(todayChanges);
   const sleepBlocks = toSleepBlocks(sleepEntries);
   const weeklyFeedings = aggregateByDayOfWeek(weeklyFeedingsRaw, "amount");
   const pumpingByDay = aggregateByDayOfWeek(weeklyPumpings, "amount");
-  const sleepByDay = aggregateSleepByDay(weeklySleep);
+  const sleepByDay = sleepByCalendarDay(weeklySleep);
+  const sleepKeys = [...new Set(sleepByDay.flatMap(day => Object.keys(day).filter(key => key.startsWith("sleep"))))];
   const tummyByDay = aggregateTummyByDay(weeklyTummyTimes);
-  const feedingAmounts = calculateFeedingAmounts(weights);
-  const lastBreast = getLastBreastUsed(weeklyFeedingsRaw);
+  const lastBreast = todayBreast;
   const milkTotals = summarizeMilkByType(weeklyFeedingsRaw);
   const vitaminRecommendation = getVitaminRecommendation(milkTotals);
   const vitaminMedication = summarizeVitaminMedication(medication);
   const defaultVitaminName = getDefaultVitaminMedicationName(milkTotals);
-  const feedingMethods = summarizeFeedingMethods(feedings);
-  const hoursSinceLastFeeding = getHoursSinceLastFeeding(recentFeedings);
+  const feedingMethods = summarizeFeedingMethods(todayFeedings);
+  const hoursSinceLastFeeding = elapsedSince(recentFeedings, "start");
+  const hoursSinceLastSleep = elapsedSince(recentSleep, "end");
+  const daysSinceLastDiaper = daysSince(recentChanges);
+  const feedingAmount = todayFeedings.reduce((sum, entry) => sum + (parseFloat(entry.amount) || 0), 0);
 
   const totalSleep = sleepEntries.reduce(
     (s, e) => s + parseDuration(e.duration),
     0
   );
-  const totalDiapers = changes.length;
+  const totalDiapers = todayChanges.length;
   const avgTummy =
-    tummyTimes.length > 0
-      ? tummyTimes.reduce((s, t) => s + parseDuration(t.duration) * 60, 0) /
-        tummyTimes.length
+    todayTummy.length > 0
+      ? todayTummy.reduce((s, t) => s + parseDuration(t.duration) * 60, 0) /
+        todayTummy.length
       : 0;
 
-  const wetCount = changes.filter((c) => c.wet && !c.solid).length;
-  const solidCount = changes.filter((c) => c.solid && !c.wet).length;
-  const bothCount = changes.filter((c) => c.wet && c.solid).length;
+  const wetCount = todayChanges.filter((c) => c.wet && !c.solid).length;
+  const solidCount = todayChanges.filter((c) => c.solid && !c.wet).length;
 
   const handleChartClick = (data, type) => {
     if (!data || !data.activeLabel) return;
     const label = data.activeLabel;
-    const value = data.activePayload?.[0]?.value;
+    const value = type === "sleep" ? data.activePayload?.[0]?.payload?.hours : data.activePayload?.[0]?.value;
     setSelectedBar({ type, label, value });
   };
 
@@ -98,7 +104,7 @@ export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedi
     } else if (type === "pumping") {
       dayData = getEntriesForDay(weeklyPumpings, day, "start");
     } else if (type === "sleep") {
-      dayData = getEntriesForDay(weeklySleep, day, "start");
+      dayData = sleepEntriesForDay(weeklySleep, day);
     } else if (type === "tummy") {
       dayData = getEntriesForDay(weeklyTummyTimes, day, "start");
     }
@@ -120,17 +126,9 @@ export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedi
         <div className="fade-in fade-in-1">
           <StatCard
             icon={<Icons.Bottle />}
-            label="Feedings"
-            value={feedingMethods.breast
-              ? `${feedingMethods.bottle} bottle · ${feedingMethods.breast} breast`
-              : hoursSinceLastFeeding != null
-                ? `${feedingMethods.bottle} bottle · ${hoursSinceLastFeeding.toFixed(1)}h since last feeding`
-                : `${feedingMethods.bottle} bottle · no feedings yet`}
-            sub={[
-              `${feedingMethods.total} feeding${feedingMethods.total !== 1 ? "s" : ""} today`,
-              feedingMethods.other ? `${feedingMethods.other} other` : null,
-              feedingMethods.bottleAmount ? `${Math.round(feedingMethods.bottleAmount)} ${units.volume} bottle` : null,
-            ].filter(Boolean).join(" · ")}
+            label="Feedings today"
+            value={`${feedingMethods.total} · ${Math.round(feedingAmount)} ${units.volume}`}
+            sub={`${formatHoursMinutes(hoursSinceLastFeeding)} since last`}
             color={colors.feeding}
           />
         </div>
@@ -138,8 +136,8 @@ export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedi
           <StatCard
             icon={<Icons.Moon />}
             label="Sleep"
-            value={`${totalSleep.toFixed(1)}h`}
-            sub="Last 24 hours"
+            value={formatHoursMinutes(totalSleep)}
+            sub={`Last 24h · ${formatHoursMinutes(hoursSinceLastSleep)} since last`}
             color={colors.sleep}
           />
         </div>
@@ -148,19 +146,21 @@ export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedi
             icon={<Icons.Droplet />}
             label="Diapers"
             value={totalDiapers}
-            sub={`${wetCount} wet · ${solidCount} solid · ${bothCount} both`}
+            sub={daysSinceLastDiaper == null ? "No records yet" : `${daysSinceLastDiaper} day${daysSinceLastDiaper !== 1 ? "s" : ""} since last`}
             color={colors.diaper}
           />
         </div>
+        {todayTummy.length > 0 && (
         <div className="fade-in fade-in-4">
           <StatCard
             icon={<Icons.Sun />}
             label="Tummy Time"
             value={`${Math.round(avgTummy)}m`}
-            sub={`${tummyTimes.length} session${tummyTimes.length !== 1 ? "s" : ""} today`}
+            sub={`${todayTummy.length} session${todayTummy.length !== 1 ? "s" : ""} today`}
             color={colors.tummy}
           />
         </div>
+        )}
       </div>
 
       {/* Feeding Insights */}
@@ -172,39 +172,6 @@ export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedi
           marginBottom: 20,
         }}
       >
-        <div className="fade-in fade-in-1">
-          <SectionCard title="Feeding Amount Guide" icon={<Icons.Weight />} color={colors.growth}>
-            {feedingAmounts ? (
-              <div style={{ display: "grid", gap: 12 }}>
-                <div style={{ color: "var(--text-muted)", fontSize: 13 }}>
-                  Based on {feedingAmounts.weight} kg × 150 {units.volume}/kg/day
-                </div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
-                  <div>
-                    <div style={{ color: "var(--text-dim)", fontSize: 11 }}>Daily</div>
-                    <div style={{ color: colors.growth, fontSize: 20, fontWeight: 700 }}>{feedingAmounts.dailyAmount}</div>
-                    <div style={{ color: "var(--text-muted)", fontSize: 11 }}>{units.volume}</div>
-                  </div>
-                  <div>
-                    <div style={{ color: "var(--text-dim)", fontSize: 11 }}>5 feeds</div>
-                    <div style={{ color: colors.growth, fontSize: 20, fontWeight: 700 }}>{feedingAmounts.fiveFeeds}</div>
-                    <div style={{ color: "var(--text-muted)", fontSize: 11 }}>{units.volume}/feed</div>
-                  </div>
-                  <div>
-                    <div style={{ color: "var(--text-dim)", fontSize: 11 }}>6 feeds</div>
-                    <div style={{ color: colors.growth, fontSize: 20, fontWeight: 700 }}>{feedingAmounts.sixFeeds}</div>
-                    <div style={{ color: "var(--text-muted)", fontSize: 11 }}>{units.volume}/feed</div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div style={{ color: "var(--text-dim)", fontSize: 13, textAlign: "center", padding: 20 }}>
-                Add a weight entry to calculate feeding amounts
-              </div>
-            )}
-          </SectionCard>
-        </div>
-
         <div className="fade-in fade-in-3">
           <SectionCard title="Milk & Vitamins" icon={<Icons.Bottle />} color={colors.tummy}>
             <div style={{ display: "grid", gap: 12 }}>
@@ -287,7 +254,7 @@ export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedi
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))",
           gap: 16,
         }}
       >
@@ -347,6 +314,7 @@ export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedi
         </div>
 
         {/* Pumping Timeline */}
+        {todayPumpings.length > 0 && (
         <div className="fade-in fade-in-4">
           <SectionCard title="Recent Pumpings" icon={<Icons.Pump />} color={colors.pumping}>
             {pumpingTimeline.length > 0 ? (
@@ -375,7 +343,9 @@ export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedi
             )}
           </SectionCard>
         </div>
+        )}
 
+        {todayBreast != null && (
         <div className="fade-in fade-in-5">
           <SectionCard title="Breast Feeding" icon={<Icons.Heart />} color={colors.feeding}>
             <div style={{ display: "grid", gap: 12 }}>
@@ -391,6 +361,7 @@ export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedi
             </div>
           </SectionCard>
         </div>
+        )}
 
         {/* Sleep */}
         <div className="fade-in fade-in-5">
@@ -401,7 +372,7 @@ export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedi
                   <div key={i} className="entry-clickable" onClick={() => onEditEntry?.("sleep", s.entry)}>
                     <TimelineItem
                       time={`${s.start}–${s.end}`}
-                      label={`${s.duration.toFixed(1)}h${s.nap ? " · Nap" : ""}`}
+                      label={`${formatHoursMinutes(s.duration)}${s.nap ? " · Nap" : ""}`}
                       detail={`${s.start} to ${s.end}`}
                       color={colors.sleep}
                       isLast={i === arr.length - 1}
@@ -427,16 +398,18 @@ export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedi
                       <CartesianGrid strokeDasharray="3 3" stroke="#252836" vertical={false} />
                       <XAxis dataKey="day" tick={{ fontSize: 11, fill: "#5A6178" }} axisLine={false} tickLine={false} />
                       <YAxis hide />
-                      <Tooltip content={<CustomTooltip />} />
-                      <Bar dataKey="hours" fill={colors.sleep} radius={[6, 6, 0, 0]} opacity={0.85} cursor="pointer" />
+                      <Tooltip content={<SleepTooltip />} />
+                      {sleepKeys.map((key, index) => (
+                        <Bar key={key} dataKey={key} name={`Sleep ${index + 1}`} stackId="sleep" fill={index % 2 ? "#B49AF8" : colors.sleep} stroke="var(--card-bg)" strokeWidth={1} cursor="pointer" />
+                      ))}
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
                 {selectedBar?.type === "sleep" && (
                   <ChartDetailBar
                     label={selectedBar.label}
-                    value={selectedBar.value}
-                    unit="h"
+                    value={formatHoursMinutes(selectedBar.value)}
+                    unit=""
                     color={colors.sleep}
                     onViewEntries={() => openDayModal(selectedBar.label, "sleep")}
                     onDismiss={() => setSelectedBar(null)}
@@ -448,6 +421,7 @@ export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedi
         </div>
 
         {/* Diapers */}
+        {todayChanges.length > 0 && (
         <div className="fade-in fade-in-5">
           <SectionCard title="Diaper Changes" icon={<Icons.Droplet />} color={colors.diaper}>
             {diaperTimeline.length > 0 ? (
@@ -516,8 +490,10 @@ export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedi
             )}
           </SectionCard>
         </div>
+        )}
 
         {/* Tummy Time */}
+        {todayTummy.length > 0 && (
         <div className="fade-in fade-in-6">
           <SectionCard title="Tummy Time" icon={<Icons.Sun />} color={colors.tummy}>
             {tummyByDay.some((d) => d.minutes > 0) ? (
@@ -571,8 +547,10 @@ export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedi
             )}
           </SectionCard>
         </div>
+        )}
 
         {/* Daily Pumping Amounts */}
+        {todayPumpings.length > 0 && (
         <div className="fade-in fade-in-6" style={{ gridColumn: "1 / -1" }}>
           <SectionCard title="Daily Pumping Amounts" icon={<Icons.Pump />} color={colors.pumping}>
             {pumpingByDay.some((d) => d.amount > 0) ? (
@@ -614,7 +592,7 @@ export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedi
                     <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
                       Today{" "}
                       <strong style={{ color: colors.pumping }}>
-                        {Math.round(pumpings.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0))} {units.volume}
+                        {Math.round(todayPumpings.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0))} {units.volume}
                       </strong>{" "}
                       pumped
                     </span>
@@ -628,6 +606,7 @@ export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedi
             )}
           </SectionCard>
         </div>
+        )}
       </div>
 
       {/* Day Activities Modal */}
@@ -641,5 +620,16 @@ export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedi
         />
       )}
     </>
+  );
+}
+
+function SleepTooltip({ active, payload, label }) {
+  if (!active || !payload?.length) return null;
+  const sleeps = payload.filter(item => item.value > 0);
+  return (
+    <div style={{ background: "var(--tooltip-bg)", border: "1px solid var(--border)", borderRadius: 10, padding: "8px 12px", fontSize: 12 }}>
+      <strong>{label} · {formatHoursMinutes(payload[0].payload.hours)}</strong>
+      {sleeps.map(item => <div key={item.dataKey} style={{ color: item.color }}>{item.name}: {formatHoursMinutes(item.value)}</div>)}
+    </div>
   );
 }

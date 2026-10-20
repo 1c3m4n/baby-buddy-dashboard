@@ -1,0 +1,32 @@
+import assert from 'node:assert/strict';
+import { createServer } from 'vite';
+import React from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { readFile } from 'node:fs/promises';
+const server = await createServer({ server: { middlewareMode: true, hmr: false, ws: false }, optimizeDeps: { noDiscovery: true, include: [] }, appType: 'custom' });
+try {
+  const { default: Overview } = await server.ssrLoadModule('/src/tabs/OverviewTab.jsx');
+  const now = new Date();
+  const at = hours => new Date(now.getTime() - hours * 3600000).toISOString();
+  const base = {feedings:[],recentFeedings:[],weeklyFeedings:[],pumpings:[],weeklyPumpings:[],medication:[],sleepEntries:[],recentSleep:[],weeklySleep:[],changes:[],recentChanges:[],tummyTimes:[],weeklyTummyTimes:[]};
+  const render = props => renderToStaticMarkup(React.createElement(Overview, {...base,...props}));
+  const empty = render({});
+  for (const title of ['Feeding Amount Guide','Breast Feeding','Recent Pumpings','Diaper Changes','Daily Pumping Amounts','Tummy Time']) assert.ok(!empty.includes(title), `empty card hidden: ${title}`);
+  const historical = render({feedings:[{start:at(48),method:'left breast'}],pumpings:[{start:at(48),amount:50}],weeklyPumpings:[{start:at(48),amount:50}],changes:[{time:at(48)}],tummyTimes:[{start:at(48),duration:'00:10:00'}],weeklyTummyTimes:[{start:at(48),duration:'00:10:00'}]});
+  for (const title of ['Breast Feeding','Recent Pumpings','Diaper Changes','Daily Pumping Amounts','Tummy Time']) assert.ok(!historical.includes(title), `yesterday cannot reveal today's card: ${title}`);
+  const today = new Date(now); today.setHours(0,0,0,0);
+  const stamp = new Date((today.getTime() + now.getTime()) / 2).toISOString();
+  const populated = render({feedings:[{start:stamp,method:'left breast',amount:120}],recentFeedings:[{start:at(3.5)}],pumpings:[{start:stamp,amount:50}],changes:[{time:stamp,wet:true}],tummyTimes:[{start:stamp,duration:'00:10:00'}],recentSleep:[{end:at(2.25)}],recentChanges:[{time:at(73)}]});
+  for (const title of ['Breast Feeding','Recent Pumpings','Diaper Changes','Daily Pumping Amounts','Tummy Time']) assert.ok(populated.includes(title), `today shows card: ${title}`);
+  assert.ok(populated.includes('1 · 120 mL'));
+  assert.ok(populated.includes('3h 30m since last'));
+  assert.ok(populated.includes('2h 15m since last'));
+  assert.ok(populated.includes('3 days since last'));
+  const hook = await readFile(new URL('../src/hooks/useBabyData.js',import.meta.url),'utf8');
+  const app = await readFile(new URL('../src/App.jsx',import.meta.url),'utf8');
+  assert.match(hook, /api.getSleep\(\{ child: c, end_min: weekMin/);
+  assert.match(hook, /api.getSleep\(\{ child: c, limit: 1, ordering: "-end"/);
+  assert.match(hook, /api.getChanges\(\{ child: c, limit: 1, ordering: "-time"/);
+  for (const name of ['recentSleep','recentChanges']) assert.ok(app.includes(`${name}={data.${name}}`));
+  console.log('overview rendered visibility and elapsed stats checks passed');
+} finally { await server.close(); }

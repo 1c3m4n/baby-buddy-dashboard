@@ -39,11 +39,9 @@ assert.equal(
   "no feeding should have no elapsed-hours value"
 );
 
-assert.match(
-  overviewSource,
-  /value=\{feedingMethods\.breast[\s\S]*hoursSinceLastFeeding\.toFixed\(1\)\}h since last feeding/,
-  "the top feeding card should replace a zero-breast count with hours since the latest feeding began"
-);
+assert.match(overviewSource, /formatHoursMinutes\(hoursSinceLastFeeding\)/);
+assert.match(overviewSource, /since last/);
+assert.doesNotMatch(overviewSource, /Feeding Amount Guide/);
 
 const recentPumpingsIndex = overviewSource.indexOf('title="Recent Pumpings"');
 const breastFeedingIndex = overviewSource.indexOf('title="Breast Feeding"');
@@ -62,10 +60,6 @@ assert.match(
   /api\.getFeedings\(\{\s*child:\s*c,\s*limit:\s*5,\s*ordering:\s*["']-start["']\s*\}\)/,
   "useBabyData should request only the five latest feedings without a date range"
 );
-assert.match(overviewSource, /feedingAmounts\.fiveFeeds/);
-assert.match(overviewSource, /feedingAmounts\.sixFeeds/);
-assert.match(overviewSource, />5 feeds</);
-assert.match(overviewSource, />6 feeds</);
 assert.match(hookSource, /setRecentFeedings\(\(recentFeedingsRes\.results\s*\|\|\s*\[\]\)\.slice\(0,\s*5\)\)/);
 assert.equal(
   (hookSource.match(/setRecentFeedings\(mock\.weeklyFeedings\.slice\(0,\s*5\)\)/g) || []).length,
@@ -76,6 +70,6 @@ assert.match(hookSource, /recentFeedings,/);
 assert.match(appSource, /recentFeedings=\{data\.recentFeedings\}/);
 assert.match(overviewSource, /recentFeedings\s*=\s*\[\]/);
 assert.match(overviewSource, /toFeedingTimeline\(recentFeedings,\s*units\.volume\)/);
-assert.match(overviewSource, /getHoursSinceLastFeeding\(recentFeedings\)/);
+assert.match(overviewSource, /elapsedSince\(recentFeedings, "start"\)/);
 
 console.log("overview feeding priority checks passed");
