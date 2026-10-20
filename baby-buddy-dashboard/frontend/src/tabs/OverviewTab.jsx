@@ -127,8 +127,11 @@ export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedi
           <StatCard
             icon={<Icons.Bottle />}
             label="Feedings today"
-            value={`${feedingMethods.total} · ${Math.round(feedingAmount)} ${units.volume}`}
-            sub={`${formatHoursMinutes(hoursSinceLastFeeding)} since last`}
+            value={`${feedingMethods.total} feed${feedingMethods.total !== 1 ? "s" : ""}`}
+            sub={<>
+              <div>{Math.round(feedingAmount)} {units.volume}</div>
+              <div style={{ marginTop: 4 }}>{formatHoursMinutes(hoursSinceLastFeeding)} since last</div>
+            </>}
             color={colors.feeding}
           />
         </div>
@@ -137,7 +140,7 @@ export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedi
             icon={<Icons.Moon />}
             label="Sleep"
             value={formatHoursMinutes(totalSleep)}
-            sub={`Last 24h · ${formatHoursMinutes(hoursSinceLastSleep)} since last`}
+            sub={`${formatHoursMinutes(hoursSinceLastSleep)} since last`}
             color={colors.sleep}
           />
         </div>
@@ -163,15 +166,8 @@ export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedi
         )}
       </div>
 
-      {/* Feeding Insights */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-          gap: 14,
-          marginBottom: 20,
-        }}
-      >
+      {/* Main Grid */}
+      <div className="overview-grid">
         <div className="fade-in fade-in-3">
           <SectionCard title="Milk & Vitamins" icon={<Icons.Bottle />} color={colors.tummy}>
             <div style={{ display: "grid", gap: 12 }}>
@@ -248,16 +244,7 @@ export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedi
             </div>
           </SectionCard>
         </div>
-      </div>
 
-      {/* Main Grid */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))",
-          gap: 16,
-        }}
-      >
         {/* Feeding Timeline */}
         <div className="fade-in fade-in-3">
           <SectionCard title="Recent Feedings" icon={<Icons.Bottle />} color={colors.feeding}>
@@ -551,7 +538,7 @@ export default function OverviewTab({ feedings, recentFeedings = [], weeklyFeedi
 
         {/* Daily Pumping Amounts */}
         {todayPumpings.length > 0 && (
-        <div className="fade-in fade-in-6" style={{ gridColumn: "1 / -1" }}>
+        <div className="fade-in fade-in-6">
           <SectionCard title="Daily Pumping Amounts" icon={<Icons.Pump />} color={colors.pumping}>
             {pumpingByDay.some((d) => d.amount > 0) ? (
               <>

@@ -170,3 +170,8 @@ There is no tracked GitHub Actions workflow in this checkout. The add-on has no 
 - Breast Feeding, Recent Pumpings, Diaper Changes, Tummy Time (including its summary) and Daily Pumping Amounts are hidden without matching records today; historical data alone does not reveal them.
 - Sleep Pattern uses a stacked segment per sleep session. `overviewInsights.js` clips each session at local calendar boundaries, including DST, and the weekly query uses `end_min` to include sleeps entering the first displayed day. Day details show clipped portions while edits retain original timestamps.
 - Overview regression tests cover elapsed formatting, day splitting, midnight/week boundaries, DST and rendered today/empty/historical card visibility.
+
+## Overview refinement in 1.2.29
+
+- Feeding summary reads “x feeds” (singular “1 feed”), with mL and “since last” underneath. Sleep keeps its rolling total but omits the “Last 24h” caption.
+- Milk & Vitamins and every other overview detail card share `.overview-grid`, including Daily Pumping Amounts. Cards sit side by side when two 320px columns plus the gap fit; narrow screens stack them. Previously Milk & Vitamins occupied a separate grid and forced a full-width row.

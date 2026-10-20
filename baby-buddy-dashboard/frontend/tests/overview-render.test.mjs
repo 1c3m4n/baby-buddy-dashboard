@@ -18,7 +18,11 @@ try {
   const stamp = new Date((today.getTime() + now.getTime()) / 2).toISOString();
   const populated = render({feedings:[{start:stamp,method:'left breast',amount:120}],recentFeedings:[{start:at(3.5)}],pumpings:[{start:stamp,amount:50}],changes:[{time:stamp,wet:true}],tummyTimes:[{start:stamp,duration:'00:10:00'}],recentSleep:[{end:at(2.25)}],recentChanges:[{time:at(73)}]});
   for (const title of ['Breast Feeding','Recent Pumpings','Diaper Changes','Daily Pumping Amounts','Tummy Time']) assert.ok(populated.includes(title), `today shows card: ${title}`);
-  assert.ok(populated.includes('1 · 120 mL'));
+  assert.ok(populated.includes('1 feed<'));
+  assert.ok(populated.includes('120 mL'));
+  assert.ok(empty.includes('0 feeds<'));
+  assert.ok(!populated.includes('Last 24h ·'));
+  assert.equal((populated.match(/class="overview-grid"/g) || []).length, 1);
   assert.ok(populated.includes('3h 30m since last'));
   assert.ok(populated.includes('2h 15m since last'));
   assert.ok(populated.includes('3 days since last'));
